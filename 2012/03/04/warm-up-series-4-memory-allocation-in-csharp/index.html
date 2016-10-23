@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+
+
+<title>
+  
+    Warm Up Series (4) – Memory Allocation in CSharp
+  
+</title>
+
+<meta name="description" content="在写完上一篇文章后，开始联想到.NET的内存管理机制，于是继续Google出一些文章，大概对C#中的内存管理有了了解。C#的内存管理的实现是在操作系统内存管理之上的，特别是托管堆的3 generations的设计，既保护了代码编写的方便性，也充分考虑了性能的优化。
+按照MSDN文档介绍，除stackalloc运算符外，C#不提供其他任何方法来操作非托管的内存。所以这些服务通常只能由基础操作系统导入">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Warm Up Series (4) – Memory Allocation in CSharp">
+<meta property="og:url" content="http://yoursite.com/2012/03/04/warm-up-series-4-memory-allocation-in-csharp/index.html">
+<meta property="og:site_name" content="Kevin's Blog">
+<meta property="og:description" content="在写完上一篇文章后，开始联想到.NET的内存管理机制，于是继续Google出一些文章，大概对C#中的内存管理有了了解。C#的内存管理的实现是在操作系统内存管理之上的，特别是托管堆的3 generations的设计，既保护了代码编写的方便性，也充分考虑了性能的优化。
+按照MSDN文档介绍，除stackalloc运算符外，C#不提供其他任何方法来操作非托管的内存。所以这些服务通常只能由基础操作系统导入">
+<meta property="og:updated_time" content="2016-10-23T13:39:54.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Warm Up Series (4) – Memory Allocation in CSharp">
+<meta name="twitter:description" content="在写完上一篇文章后，开始联想到.NET的内存管理机制，于是继续Google出一些文章，大概对C#中的内存管理有了了解。C#的内存管理的实现是在操作系统内存管理之上的，特别是托管堆的3 generations的设计，既保护了代码编写的方便性，也充分考虑了性能的优化。
+按照MSDN文档介绍，除stackalloc运算符外，C#不提供其他任何方法来操作非托管的内存。所以这些服务通常只能由基础操作系统导入">
+
+
+  <link rel="alternative" href="/atom.xml" title="Kevin&#39;s Blog" type="application/atom+xml">
+
+
+
+  <link rel="icon" href="/favicon.png">
+
+
+<link rel="stylesheet" href="/perfect-scrollbar/css/perfect-scrollbar.min.css">
+<link rel="stylesheet" href="/styles/main.css">
+
+
+
+
+
+
+</head>
+<body
+  
+    class="monochrome"
+  
+  >
+  <div class="mobile-header">
+  <button class="sidebar-toggle" type="button">
+    <span class="icon-bar"></span>
+    <span class="icon-bar"></span>
+    <span class="icon-bar"></span>
+  </button>
+  <a class="title" href="/">Kevin&#39;s Blog</a>
+</div>
+
+  <div class="main-container">
+    <div class="sidebar">
+  <div class="header">
+    <h1 class="title"><a href="/">Kevin&#39;s Blog</a></h1>
+    
+    <div class="info">
+      <div class="content">
+        
+        
+          <div class="author">Hao Xi</div>
+        
+      </div>
+      
+        <div class="avatar">
+          
+            <a href="/about"><img src="https://cn.gravatar.com/avatar/35fef74d731255cd569c2c2b0b9e87e4?s=200"></a>
+          
+        </div>
+      
+    </div>
+  </div>
+  <div class="body">
+    
+      
+        <ul class="nav">
+          
+            
+              <li class="category-list-container">
+                <a href="javascript:;">Category</a>
+                <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Algorithms/">Algorithms</a><span class="category-list-count">13</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Asp-Net/">Asp.Net</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Basic-Theory/">Basic Theory</a><span class="category-list-count">5</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Default/">Default</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/GNU-Linux/">GNU/Linux</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Interview/">Interview</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Kevin-s-Life/">Kevin's Life</a><span class="category-list-count">9</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Performance/">Performance</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Phone/">Phone</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Programming/">Programming</a><span class="category-list-count">10</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Rework/">Rework</a><span class="category-list-count">1</span></li></ul>
+              </li>
+            
+          
+            
+              <li class="tag-list-container">
+                <a href="javascript:;">Tag</a>
+                <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/2011-Plan/">2011 Plan</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ACM-ICPC/">ACM-ICPC</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ActiveX/">ActiveX</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/AfterLogic/">AfterLogic</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Algorithms/">Algorithms</a><span class="tag-list-count">11</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Android/">Android</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Asp-Net/">Asp.Net</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/BFS/">BFS</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Business/">Business</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/C/">C#</a><span class="tag-list-count">10</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/CLRS/">CLRS</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Concurrent/">Concurrent</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Coverage/">Coverage</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Critical-Section/">Critical Section</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/DFS/">DFS</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Data-Structure/">Data Structure</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Design-Pattern-Series/">Design Pattern Series</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Dovecot/">Dovecot</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Download-Website/">Download Website</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Dream/">Dream</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Email/">Email</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Environment-Variables/">Environment Variables</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/First-Post/">First Post</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Freelance/">Freelance</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/GNOME/">GNOME</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Generic/">Generic</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Happiness/">Happiness</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Heap/">Heap</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/If-You-Are-The-One/">If You Are The One</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Interview/">Interview</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JavaScript/">JavaScript</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JobFinder/">JobFinder</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Josephus/">Josephus</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/KDE/">KDE</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/KMP/">KMP</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Let-The-Bullet-Fly/">Let The Bullet Fly</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Linux/">Linux</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/MSMQ/">MSMQ</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Mac/">Mac</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Management/">Management</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Memory/">Memory</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Monte-Carlo/">Monte Carlo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Movies/">Movies</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Mutex/">Mutex</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/My-Blogs/">My Blogs</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/My-Life/">My Life</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/My-Name/">My Name</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/MySQL/">MySQL</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Ncover/">Ncover</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Nunit/">Nunit</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Old-Boys/">Old Boys</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Online-Judge/">Online Judge</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/OpenMP/">OpenMP</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Parallel-Programming/">Parallel Programming</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Postfix/">Postfix</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Present/">Present</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Primer/">Primer</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Python/">Python</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Queue/">Queue</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Reading/">Reading</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Recursion/">Recursion</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Reverse-Polish-Notation/">Reverse Polish Notation</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Rework/">Rework</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ShengYiJie/">ShengYiJie</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Silverlight/">Silverlight</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Singleton/">Singleton</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Sparse-Matrix/">Sparse Matrix</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Stack/">Stack</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Stirling-s-Formula/">Stirling's Formula</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/String-Matching/">String Matching</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Template/">Template</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Teru-Teru-Bouz/">Teru Teru Bouz</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/The-bright-eleven/">The bright eleven</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Theory/">Theory</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Thread/">Thread</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Trace/">Trace</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Translation/">Translation</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Triple-Table/">Triple Table</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Unit-Test/">Unit Test</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/VPS/">VPS</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Webmail/">Webmail</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Wedding/">Wedding</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Windows/">Windows</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Windows-Phone-7/">Windows Phone 7</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/X-Window/">X Window</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Xml/">Xml</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/iPhone/">iPhone</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vWorker/">vWorker</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/wget/">wget</a><span class="tag-list-count">1</span></li></ul>
+              </li>
+            
+          
+            
+              <li class="archive-list-container">
+                <a href="javascript:;">Archive</a>
+                <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/">2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/">2012</a><span class="archive-list-count">17</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/">2011</a><span class="archive-list-count">8</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/">2010</a><span class="archive-list-count">25</span></li></ul>
+              </li>
+            
+          
+        </ul>
+      
+        <ul class="nav">
+          
+            
+              <li>
+                <a href="/" title="Homepage">Homepage</a>
+              </li>
+            
+          
+            
+              <li>
+                <a href="/archives" title="By Year">By Year</a>
+              </li>
+            
+          
+        </ul>
+      
+        <ul class="nav">
+          
+            
+              <li>
+                <a href="https://github.com/denjones/hexo-theme-chan" title="Chan" target="_blank" rel="external">Chan</a>
+              </li>
+            
+          
+            
+              <li>
+                <a href="https://github.com/denjones" title="Github" target="_blank" rel="external">Github</a>
+              </li>
+            
+          
+            
+              <li>
+                <a href="/atom.xml" title="RSS">RSS</a>
+              </li>
+            
+          
+        </ul>
+      
+    
+  </div>
+</div>
+
+    <div class="main-content">
+      
+        <div style="max-width: 1000px">
+      
+          <article id="post-warm-up-series-4-memory-allocation-in-csharp" class="article article-type-post">
+  
+    <h1 class="article-header">
+      Warm Up Series (4) – Memory Allocation in CSharp
+    </h1>
+  
+  
+
+  <div class="article-info">
+    <span class="article-date">
+  2012-03-04
+</span>
+
+    
+	<span class="article-category tagcloud">
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/Programming/">Programming</a><ul class="article-category-list-child"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/Programming/Warm-Up/">Warm Up</a></li></ul></li></ul>
+	</span>
+
+
+    
+	<span class="article-tag tagcloud">
+		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/C/">C#</a></li></ul>
+	</span>
+
+
+  </div>
+  <div class="article-entry">
+    <p>在写完上一篇文章后，开始联想到.NET的内存管理机制，于是继续Google出一些文章，大概对C#中的内存管理有了了解。C#的内存管理的实现是在操作系统内存管理之上的，特别是托管堆的3 generations的设计，既保护了代码编写的方便性，也充分考虑了性能的优化。</p>
+<p>按照MSDN文档介绍，除stackalloc运算符外，C#不提供其他任何方法来操作非托管的内存。所以这些服务通常只能由基础操作系统导入。<a href="http://msdn.microsoft.com/zh-cn/library/aa664786(v=vs.71" target="_blank" rel="external">这里的例子</a>.aspx)通过非安全代码调用系统API实现了托管堆以外的内存管理。</p>
+<p>&#160;</p>
+<p>转自《<a href="http://www.cnblogs.com/yangjunwl/archive/2008/01/08/1029903.html" target="_blank" rel="external">C#的内存管理：堆栈、托管堆与指针</a>》</p>
+<p>在32位的Windows操作系统中，每个进程都可以使用4GB的内存，这得益于虚拟寻址技术，在C#中，虚拟内存有个两个存储变量的区域，堆栈和托管堆；堆栈存储值类型数据，每个线程都有自己的堆栈。而托管堆存储引用类型如类、对象，并受垃圾收集器的管理。当一个类对象不再被使用时，这个对象被存储在堆栈中的引用变量将被删除，但是在托管堆中的对象实例仍然存在，其空间何时被释放取决垃圾收集器。</p>
+<p>在C/C++中，程序运行久了可能会产生大量的内存碎片，寻址这些碎片数据也会增加系统开销。在.NET中这种情况得到很大改善，因为垃圾收集器会压缩托管堆的内存空间，保证可用变量在一个连续的内存空间内，同时将堆栈中引用变量中的地址更新为新的地址，虽然这会带来额外的系统开销，但是，其降低了内存碎片程度和内存泄露问题。</p>
+<p>另一方面，在某些时候C#程序也需要追求速度，比如对一个含用大量成员的数组操作，因为数组在C#中是System.Array的实例，会存储在托管堆中，这将会对运算造成大量的额外的操作，因为除了垃圾收集器除了会压缩托管堆、更新引用地址、还会维护托管堆的信息列表。所幸的是C#中同样能够通过使用标记为unsafe的代码块调用指针，比如声明一个存储有50个double类型的数组：</p>
+<font face="Courier New"><span class="kwrd">double</span> *pDouble = <span class="kwrd">stackalloc</span> <span class="kwrd">double</span>[50];</font>
+
+<p>垃圾收集器和堆管理系统常常涉及为提高性能而作的优化设计。举例来说，垃圾收集遍历整个内存池具有很高的开销。然而，研究表明大部分在托管堆上分配的对象只有很短的生存期，因此堆被分成三个段，称作generations。新分配的对象被放在generation 0中。这个generation是最先被回收的，在这个generation中最有可能找到不再使用的内存，由于它的尺寸很小（小到足以放进处理器的L2 cache中），因此它里面的回收将是最高效的。托管堆的另外一种优化操作与locality of reference规则有关。该规则表明，一起分配的对象经常被一起使用。如果对象们在堆中位置很紧凑的话，高速缓存的性能将会得到提高。由于托管堆的天性，对象们总是被分配在连续的地址上，使得对象们始终彼此靠近。这一点与非托管代码形成了鲜明的对比，在标准堆中，堆很容易变成碎片，而且一起分配的对象经常分得很远。还有一种优化与大对象有关，大对象堆用来放置尺寸超过85K的对象，这部分数据一般不会被GC，但当generation 2发生垃圾会收时，意味着系统可能无法分配所需的内存，这时大对象堆上也需要进行垃圾回收。</p>
+<p>再说内存分配，当对象被分配的时候，它们一开始被放在generation 0中。当generation 0的大小快要达到它的上限的时候，一个只在generation 0中执行的回收操作被触发。由于其大小很小，因此这将是一个非常快的过程，其不再使用的对象将被释放，正被使用的对象被整理并移入generation 1中。当generation 1的大小随着从generation 0中移入的对象数量的增加而接近上限时，一个回收动作将会在generation 0和generation 1中执行，不再使用的对象被释放，正在被使用的对象被整理并移入下一个generation中。大部分GC过程的主要目标是generation 0，因为在generation 0中最有可能存在大量的已不再使用的临时对象。对generation 2的回收过程具有很高的开销，此过程只有在generation 0和generation 1的GC过程不能释放足够的内存时才会被触发。如果对generation 2的GC过程仍然不能释放足够的内存，那么系统就会抛出OutOfMemoryException异常。</p>
+<p>当然，C#程序中也存在值类型和托管堆不能管理的对象，比如文件名柄、网络连接和数据库连接，这些变量的释放仍需要程序员通过析构函数或IDispose接口来做。对于所有拥有外部资源的类，在这些资源已经不再用到的时候，都应当执行Close或者Dispose方法。Dispose模式通过IDisposable接口来实现，需要清理外部资源的类还应当实现一个终止操作。在C#中，创建终止操作的首选方式是在析构函数中实现，而在Framework层，终止操作的实现则是通过重载System.Object.Finalize 方法。</p>
+<p>带有终止操作的对象的垃圾收集过程要稍微复杂一些。当一个带有终止操作的对象被标记为垃圾时，它并不会被立即释放。相反，它会被放置在一个终止队列中，此队列为这个对象建立一个引用，来避免这个对象被回收。后台线程为队列中的每个对象执行它们各自的终止操作，并且将已经执行过终止操作的对象从终止队列中删除。只有那些已经执行过终止操作的对象才会在下一次垃圾回收过程中被从内存中删除。</p>
+<p>&#160;</p>
+<p>转自《<a href="http://blog.csdn.net/songkexin/article/details/5376389" target="_blank" rel="external">.NET内存分配浅析</a>》</p>
+<p>这篇文章中阐述的内容大多和上一篇类似，而且文本比较差，故只摘录一小部分：</p>
+<p>托管堆被触发GC的三个可能条件：</p>
+<ul>
+<li>1、当在托管堆上的generation 0分配内存被耗尽时（最常见），或者分配一个大对象超过了大对象堆的阀值。<em>   2、当显示调用GC.Collect()的时候。</em>   3、当操作系统的内存比较紧张时，这时操作系统会通知垃圾收集器进行GC。  </li>
+</ul>
+<p>&#160;</p>
+<p>转自《<a href="http://www.cnblogs.com/instance/archive/2011/05/24/2056091.html" target="_blank" rel="external">原来是这样：C#中字符串的内存分配与驻留池</a>》</p>
+<p>这篇文章主要是对.NET中CLR对String类内存管理上的优化处理进行分析：</p>
+<p>CLR维护一个叫做驻留池（Intern Pool）的表。这个表记录了所有在代码中使用字面量声明的字符串实例的引用。使用字面量声明的字符串会进入驻留池，而其他方式声明的字符串则不会进入，也就不会自动享受到CLR防止字符串冗余的机制的好处了。请看这个例子：</p>
+<font face="Courier New">StringBuilder sb = new StringBuilder();<br>sb.Append(&quot;He&quot;).Append(&quot;llo&quot;);<br>string s1 = &quot;Hello&quot;;<br>string s2 = sb.ToString();<br>bool same = (object) s1 == (object) s2;</font>
+
+<p>这时由于s2不是通过字面量声明的，CLR在为sb.ToString()方法的返回值分配内存时，并不会到驻留池中检查是否有值为“Hello”的字符串已经存在，所以不会让s2指向驻留池内的对象。为了让编程者能够强制CLR检查驻留池，以避免冗余的字符串副本，String类的设计者提供了一个名为Intern的类方法。下面是该方法的一个示例：</p>
+<font face="Courier New">StringBuilder sb = new StringBuilder();<br>sb.Append(&quot;He&quot;).Append(&quot;llo&quot;);<br>string s1 = &quot;Hello&quot;;<br>string s2 = String.Intern(sb.ToString());<br>bool same = (object) s1 == (object) s2;</font>
+
+<p>好了，same又是true了。Intern方法接受一个字符串作为参数，它会在驻留池中检查是否存在参数所表示的字符串。如果存在，则返回那个驻留池中的字符串的引用；否则向驻留池中加入一个新的表示相同值的字符串，并返回这个字符串的引用。不过要注意的是，就算Intern方法在驻留池中找到了相同值的字符串，也不能让您省却一次字符串内存分配的操作，因为作为参数的字符串已经被分配了一次内存了。而使用Intern方法的好处在于，如果Intern方法在驻留池中找到了相同值的字符串，此时虽然在内存中存在两份该字符串的副本（一份是参数，一份是驻留池中的），但是随着时间的流逝，参数所引用的那个副本会被垃圾回收掉，这样对于该字符串内存中就不存在冗余了。</p>
+<p>当您的程序中存在某个方法，可以根据不同的上下文环境创建并返回一个很长的字符串，而在程序运行的过程中它有会经常返回同样的字符串时，您可能就要考虑考虑使用Intern方法来提高内存的利用率了。不过同样值得注意的是，使用Intern方法让一个字符串存活于驻留池中也有一个副作用：即使已经不存在任何其它引用指向驻留池中的字符串了，这个字符串仍然不一定会被垃圾回收掉。也就是说即使驻留池中的字符串已经没有用处了，它可能也要等到CLR终结时才被销毁。当您使用Intern方法的时候，也应该考虑到这个特殊的行为。</p>
+
+  </div>
+  <footer class="article-footer">
+    
+  <div class="cc">
+    <a href="http://creativecommons.org/licenses/by-sa/4.0/deed.e" target="_blank" title="Attribution-ShareAlike">
+      <img src="/images/cc/cc.png">
+      
+          <img src="/images/cc/by.png">
+        
+          <img src="/images/cc/sa.png">
+      
+      <span>
+        This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.
+      </span>
+    </a>
+  </div>
+
+
+    
+
+  </footer>
+</article>
+
+
+
+
+
+
+
+          <div class="main-footer">
+  
+    © 2016 Kevin&#39;s Blog - Powered by <a href="http://hexo.io" target="_blank">Hexo</a> - Theme <a href="https://github.com/denjones/hexo-theme-chan" target="_blank">Chan</a>
+  
+</div>
+
+      
+        </div>
+      
+    </div>
+  </div>
+  <script src="//apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+
+  <link rel="stylesheet" href="/PhotoSwipe/photoswipe.css">
+  <link rel="stylesheet" href="/PhotoSwipe/default-skin/default-skin.css">
+
+  <!-- Root element of PhotoSwipe. Must have class pswp. -->
+  <div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    <!-- Background of PhotoSwipe.
+             It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+
+      <!-- Container that holds slides.
+                PhotoSwipe keeps only 3 of them in the DOM to save memory.
+                Don't modify these 3 pswp__item elements, data is added later on. -->
+      <div class="pswp__container">
+        <div class="pswp__item"></div>
+        <div class="pswp__item"></div>
+        <div class="pswp__item"></div>
+      </div>
+
+      <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+      <div class="pswp__ui pswp__ui--hidden">
+
+        <div class="pswp__top-bar">
+
+          <!--  Controls are self-explanatory. Order can be changed. -->
+
+          <div class="pswp__counter"></div>
+
+          <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+          <button class="pswp__button pswp__button--share" title="Share"></button>
+
+          <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+          <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+          <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+          <!-- element will get class pswp__preloader--active when preloader is running -->
+          <div class="pswp__preloader">
+            <div class="pswp__preloader__icn">
+              <div class="pswp__preloader__cut">
+                <div class="pswp__preloader__donut"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+          <div class="pswp__share-tooltip"></div>
+        </div>
+
+        <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)"></button>
+
+        <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)"></button>
+
+        <div class="pswp__caption">
+          <div class="pswp__caption__center"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/PhotoSwipe/photoswipe.js"></script>
+  <script src="/PhotoSwipe/photoswipe-ui-default.js"></script>
+
+
+<script src="/perfect-scrollbar/js/min/perfect-scrollbar.min.js"></script>
+<script src="/scripts/main.js"></script>
+
+</body>
+</html>

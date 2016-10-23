@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+
+
+<title>
+  
+    Warm Up Series (2) – Process Memory Allocation
+  
+</title>
+
+<meta name="description" content="C和C++编译器对内存分配的处理并不完全相同，但大致都可以分为两个部分：代码区和数据区；代码区是用来放置代码的，这部分内存在程序加载时就会被分配好；数据区根据网上很多说法，C和C++在这方面也只有很小的差别。
+1. C程序数据区内存
+栈 - 由编译器自动分配释放，存放为运行函数而分配的局部变量、函数参数、返回数据、返回地址等，其操作方式类似于数据结构中的栈。通过alloca方法可以在栈上手动的分配">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Warm Up Series (2) – Process Memory Allocation">
+<meta property="og:url" content="http://yoursite.com/2012/03/02/warm-up-series-2-process-memory-allocation/index.html">
+<meta property="og:site_name" content="Kevin's Blog">
+<meta property="og:description" content="C和C++编译器对内存分配的处理并不完全相同，但大致都可以分为两个部分：代码区和数据区；代码区是用来放置代码的，这部分内存在程序加载时就会被分配好；数据区根据网上很多说法，C和C++在这方面也只有很小的差别。
+1. C程序数据区内存
+栈 - 由编译器自动分配释放，存放为运行函数而分配的局部变量、函数参数、返回数据、返回地址等，其操作方式类似于数据结构中的栈。通过alloca方法可以在栈上手动的分配">
+<meta property="og:updated_time" content="2016-10-23T13:39:54.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Warm Up Series (2) – Process Memory Allocation">
+<meta name="twitter:description" content="C和C++编译器对内存分配的处理并不完全相同，但大致都可以分为两个部分：代码区和数据区；代码区是用来放置代码的，这部分内存在程序加载时就会被分配好；数据区根据网上很多说法，C和C++在这方面也只有很小的差别。
+1. C程序数据区内存
+栈 - 由编译器自动分配释放，存放为运行函数而分配的局部变量、函数参数、返回数据、返回地址等，其操作方式类似于数据结构中的栈。通过alloca方法可以在栈上手动的分配">
+
+
+  <link rel="alternative" href="/atom.xml" title="Kevin&#39;s Blog" type="application/atom+xml">
+
+
+
+  <link rel="icon" href="/favicon.png">
+
+
+<link rel="stylesheet" href="/perfect-scrollbar/css/perfect-scrollbar.min.css">
+<link rel="stylesheet" href="/styles/main.css">
+
+
+
+
+
+
+</head>
+<body
+  
+    class="monochrome"
+  
+  >
+  <div class="mobile-header">
+  <button class="sidebar-toggle" type="button">
+    <span class="icon-bar"></span>
+    <span class="icon-bar"></span>
+    <span class="icon-bar"></span>
+  </button>
+  <a class="title" href="/">Kevin&#39;s Blog</a>
+</div>
+
+  <div class="main-container">
+    <div class="sidebar">
+  <div class="header">
+    <h1 class="title"><a href="/">Kevin&#39;s Blog</a></h1>
+    
+    <div class="info">
+      <div class="content">
+        
+        
+          <div class="author">Hao Xi</div>
+        
+      </div>
+      
+        <div class="avatar">
+          
+            <a href="/about"><img src="https://cn.gravatar.com/avatar/35fef74d731255cd569c2c2b0b9e87e4?s=200"></a>
+          
+        </div>
+      
+    </div>
+  </div>
+  <div class="body">
+    
+      
+        <ul class="nav">
+          
+            
+              <li class="category-list-container">
+                <a href="javascript:;">Category</a>
+                <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Algorithms/">Algorithms</a><span class="category-list-count">13</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Asp-Net/">Asp.Net</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Basic-Theory/">Basic Theory</a><span class="category-list-count">5</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Default/">Default</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/GNU-Linux/">GNU/Linux</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Interview/">Interview</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Kevin-s-Life/">Kevin's Life</a><span class="category-list-count">9</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Performance/">Performance</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Phone/">Phone</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Programming/">Programming</a><span class="category-list-count">10</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Rework/">Rework</a><span class="category-list-count">1</span></li></ul>
+              </li>
+            
+          
+            
+              <li class="tag-list-container">
+                <a href="javascript:;">Tag</a>
+                <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/2011-Plan/">2011 Plan</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ACM-ICPC/">ACM-ICPC</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ActiveX/">ActiveX</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/AfterLogic/">AfterLogic</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Algorithms/">Algorithms</a><span class="tag-list-count">11</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Android/">Android</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Asp-Net/">Asp.Net</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/BFS/">BFS</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Business/">Business</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/C/">C#</a><span class="tag-list-count">10</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/CLRS/">CLRS</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Concurrent/">Concurrent</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Coverage/">Coverage</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Critical-Section/">Critical Section</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/DFS/">DFS</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Data-Structure/">Data Structure</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Design-Pattern-Series/">Design Pattern Series</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Dovecot/">Dovecot</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Download-Website/">Download Website</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Dream/">Dream</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Email/">Email</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Environment-Variables/">Environment Variables</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/First-Post/">First Post</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Freelance/">Freelance</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/GNOME/">GNOME</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Generic/">Generic</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Happiness/">Happiness</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Heap/">Heap</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/If-You-Are-The-One/">If You Are The One</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Interview/">Interview</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JavaScript/">JavaScript</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JobFinder/">JobFinder</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Josephus/">Josephus</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/KDE/">KDE</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/KMP/">KMP</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Let-The-Bullet-Fly/">Let The Bullet Fly</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Linux/">Linux</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/MSMQ/">MSMQ</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Mac/">Mac</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Management/">Management</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Memory/">Memory</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Monte-Carlo/">Monte Carlo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Movies/">Movies</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Mutex/">Mutex</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/My-Blogs/">My Blogs</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/My-Life/">My Life</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/My-Name/">My Name</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/MySQL/">MySQL</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Ncover/">Ncover</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Nunit/">Nunit</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Old-Boys/">Old Boys</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Online-Judge/">Online Judge</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/OpenMP/">OpenMP</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Parallel-Programming/">Parallel Programming</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Postfix/">Postfix</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Present/">Present</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Primer/">Primer</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Python/">Python</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Queue/">Queue</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Reading/">Reading</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Recursion/">Recursion</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Reverse-Polish-Notation/">Reverse Polish Notation</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Rework/">Rework</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ShengYiJie/">ShengYiJie</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Silverlight/">Silverlight</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Singleton/">Singleton</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Sparse-Matrix/">Sparse Matrix</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Stack/">Stack</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Stirling-s-Formula/">Stirling's Formula</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/String-Matching/">String Matching</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Template/">Template</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Teru-Teru-Bouz/">Teru Teru Bouz</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/The-bright-eleven/">The bright eleven</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Theory/">Theory</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Thread/">Thread</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Trace/">Trace</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Translation/">Translation</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Triple-Table/">Triple Table</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Unit-Test/">Unit Test</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/VPS/">VPS</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Webmail/">Webmail</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Wedding/">Wedding</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Windows/">Windows</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Windows-Phone-7/">Windows Phone 7</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/X-Window/">X Window</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Xml/">Xml</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/iPhone/">iPhone</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vWorker/">vWorker</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/wget/">wget</a><span class="tag-list-count">1</span></li></ul>
+              </li>
+            
+          
+            
+              <li class="archive-list-container">
+                <a href="javascript:;">Archive</a>
+                <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/">2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/">2012</a><span class="archive-list-count">17</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/">2011</a><span class="archive-list-count">8</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/">2010</a><span class="archive-list-count">25</span></li></ul>
+              </li>
+            
+          
+        </ul>
+      
+        <ul class="nav">
+          
+            
+              <li>
+                <a href="/" title="Homepage">Homepage</a>
+              </li>
+            
+          
+            
+              <li>
+                <a href="/archives" title="By Year">By Year</a>
+              </li>
+            
+          
+        </ul>
+      
+        <ul class="nav">
+          
+            
+              <li>
+                <a href="https://github.com/denjones/hexo-theme-chan" title="Chan" target="_blank" rel="external">Chan</a>
+              </li>
+            
+          
+            
+              <li>
+                <a href="https://github.com/denjones" title="Github" target="_blank" rel="external">Github</a>
+              </li>
+            
+          
+            
+              <li>
+                <a href="/atom.xml" title="RSS">RSS</a>
+              </li>
+            
+          
+        </ul>
+      
+    
+  </div>
+</div>
+
+    <div class="main-content">
+      
+        <div style="max-width: 1000px">
+      
+          <article id="post-warm-up-series-2-process-memory-allocation" class="article article-type-post">
+  
+    <h1 class="article-header">
+      Warm Up Series (2) – Process Memory Allocation
+    </h1>
+  
+  
+
+  <div class="article-info">
+    <span class="article-date">
+  2012-03-02
+</span>
+
+    
+	<span class="article-category tagcloud">
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/Programming/">Programming</a><ul class="article-category-list-child"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/Programming/Warm-Up/">Warm Up</a></li></ul></li></ul>
+	</span>
+
+
+    
+	<span class="article-tag tagcloud">
+		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/C/">C#</a></li></ul>
+	</span>
+
+
+  </div>
+  <div class="article-entry">
+    <p>C和C++编译器对内存分配的处理并不完全相同，但大致都可以分为两个部分：代码区和数据区；代码区是用来放置代码的，这部分内存在程序加载时就会被分配好；数据区根据网上很多说法，C和C++在这方面也只有很小的差别。</p>
+<p>1. C程序数据区内存</p>
+<p><strong>栈</strong> - 由编译器自动分配释放，存放为运行函数而分配的局部变量、函数参数、返回数据、返回地址等，其操作方式类似于数据结构中的栈。通过alloca方法可以在栈上手动的分配内存，栈的动态分配和堆是不同的，他的动态分配是由编译器进行释放，无需我们手工实现。不过此举并不被推荐，详见<a href="http://stackoverflow.com/questions/1018853/why-is-alloca-not-considered-good-practice" target="_blank" rel="external">此</a>文章。<br><strong>堆</strong> - 由程序分配释放，若程序不释放，在程序结束时操作系统一般会回收泄露的内存。一般是在堆的头部用一个字节存放堆的大小。堆中的具体内容有程序员安排。<br><strong>全局/静态区</strong> - 全局变量和静态变量的存储是在一块的，初始化的全局变量和静态变量在一块区域，未初始化的在相邻的一块区域，均在程序结束时释放。<br><strong>常量</strong> - 放置程序中的常量，程序结束时释放。</p>
+<p>2. C++程序数据区内存</p>
+<p><strong>栈 </strong>- 同上。<br><strong>堆 </strong>- 程序中由malloc和free来控制分配和回收的内存块，若程序不释放，在程序结束时由操作系统回收。<br><strong>自由存储区</strong> – 程序中由new和delete来控制分配和回收的内存块，若程序不释放，在程序结束时由操作系统回收。<br><strong>全局/静态区</strong> - 全局变量和静态变量被分配到同一块内存中，在以前的C语言中，全局变量又分为初始化的和未初始化的，在C++里面没有这个区分了，他们共同占用同一块内存区。<br><strong>常量 </strong>- 同上。</p>
+<p>3. 自由存储区和堆区的区别</p>
+<font color="#000000">以上内容从</font><a href="http://www.cppblog.com/zhaoyg/archive/2008/05/30/51587.html" target="_blank" rel="external"><font color="#000000">此</font></a><font color="#000000">文章整理而出，原文对C++中自由存储区和堆的介绍有错误，正确的介绍可以参考</font><a href="http://www.gotw.ca/gotw/009.htm" target="_blank" rel="external"><font color="#000000">英文原文</font></a><font color="#000000">，相关部分中文翻译如下：</font><br>  &gt; 自由存储区是C++两个动态内存区域之一，使用new和delete来予以分配和释放。在自由存储区中，对象的生存周期可以比存放它的内存区的生存周期短；也就是说，我们可以获得一片内存区而不用马上对其进行初始化；同时，在对象被销毁之后，也不用马上收回其占用的内存区。在对象被销毁而其占用的内存区还未被收回的这段时间内，我们可以通过void*的指针访问这片区域，但是其原始对象的非静态成员以及成员函数（即使我们知道了它们的地址）都不能被访问或者操纵。<br>&gt;<br>&gt; 堆区是另一个动态存储区域，使用malloc和free以及他们的变形体来进行分配和回收。要注意，虽然在特定的编译器里缺省的全局运算符new和delete也许会按照malloc和free的方式来被实现，但是堆与自由存储区是不同的——<font color="#666666">在某一个区域内被分配的内存不能在另一个区域内被安全的回收。</font>堆中被分配的内存一般用于对类对象进行placement-new的构造和explicit的析构。堆中对象的生存周期与自由存储区中的类似。<br><br><font color="#000000">C++中关于自由存储区和堆区的区别并不能统一而论，在写代码时，只要保证new-delete和malloc-free的对应关系，已经可以有效防止编译器实现差异造成的问题。</font>
+
+<p>4. 堆区和栈区的主要区别 </p>
+<p><strong>管理方式</strong>：对于栈来讲，是由编译器自动管理，无需我们手工控制；对于堆来说，释放工作由程序员控制，操作不当会产生内存泄露。 </p>
+<p><strong>空间大小</strong>：一般来讲在32位系统下，堆内存可以达到4G的空间，从这个角度来看堆内存几乎是没有什么限制的。但是对于栈来讲，一般都是有一定的空间大小的，在WINDOWS下，栈的大小是2M（VC6下默认的栈空间大小是1M，总之是一个编译时就确定的常数），如果申请的空间超过栈的剩余空间，将提示栈溢出。因此，能从栈获得的空间较小。当然，这个值可以修改。 </p>
+<p><strong>碎片问题</strong>：对于堆来讲，频繁的new/delete势必会造成内存空间的不连续，从而造成大量的碎片，使程序效率降低。对于栈来讲，则不会存在这个问题，因为栈是先进后出的队列。 </p>
+<p><strong>生长方向</strong>：对于堆来讲，生长方向是向上的，也就是向着内存地址增加的方向；对于栈来讲，它的生长方向是向下的，是向着内存地址减小的方向增长。 </p>
+<p><strong>分配方式</strong>：堆都是动态分配的，没有静态分配的堆。栈有2种分配方式：静态分配和动态分配。静态分配是编译器完成的，比如局部变量的分配。动态分配由alloca函数进行分配，但是栈的动态分配和堆是不同的，他的动态分配是由编译器进行释放，无需我们手工实现。 </p>
+<p><strong>分配效率</strong>：栈是机器系统提供的数据结构，计算机会在底层对栈提供支持：分配专门的寄存器存放栈的地址，压栈出栈都有专门的指令执行，这就决定了栈的效率比较高。堆则是C/C++函数库提供的，它的机制是很复杂的，例如为了分配一块内存，库函数会按照一定的算法在堆内存中搜索可用的足够大小的空间，如果没有足够大小的空间（可能是由于内存碎片太多），就有可能调用系统功能去增加程序数据段的内存空间，这样就有机会分到足够大小的内存，然后返回。显然，堆的效率比栈要低得多。</p>
+<p>从这里我们可以看到，堆和栈相比，由于大量new/delete的使用，容易造成大量的内存碎片；由于没有专门的系统支持，效率很低；由于可能引发用户态和核心态的切换，内存的申请，代价变得更加昂贵。所以栈在程序中是应用最广泛的，就算是函数的调用也利用栈去完成，函数调用过程中的参数，返回地址，EBP和局部变量都采用栈的方式存放。</p>
+<p>虽然栈有如此众多的好处，但是由于和堆相比不是那么灵活，有时候分配大量的内存空间，还是用堆好一些。另外，如果有人把堆栈合起来说，那它的意思是栈，可不是堆。</p>
+<p>5. new/delete与malloc/free比较</p>
+<p>从C++角度上说，使用new分配堆空间<font color="#ff0000">可以调用类的构造函数</font>，而malloc()函数仅仅是一个函数调用，它不会调用构造函数，它所接受的参数是一个unsigned long类型。同样，delete在释放堆空间之前<font color="#ff0000">会调用析构函数</font>，而free函数则不会。</p>
+<p>从结果可以看出，使用new/delete可以调用对象的构造函数与析构函数，并且示例中调用的是一个非默认构造函数。在堆上分配对象数组时，只能调用默认构造函数，不能调用其他任何构造函数。</p>
+<p>&#160;</p>
+<font color="#ff0000">Update: 关于程序内存结构的说明众说纷纭，在看了国外权威网站的英文介绍后，我认为</font><a href="http://www.diybl.com/course/3_program/c++/cppjs/20110103/552239.html" target="_blank" rel="external"><font color="#ff0000">这一篇</font></a><font color="#ff0000">中文文章的解释与英文版比较接近，另外，也可以参考</font><a href="http://www.cprogramming.com/tutorial/virtual_memory_and_heaps.html" target="_blank" rel="external"><font color="#ff0000">这篇</font></a><font color="#ff0000">英文原文。</font>
+  </div>
+  <footer class="article-footer">
+    
+  <div class="cc">
+    <a href="http://creativecommons.org/licenses/by-sa/4.0/deed.e" target="_blank" title="Attribution-ShareAlike">
+      <img src="/images/cc/cc.png">
+      
+          <img src="/images/cc/by.png">
+        
+          <img src="/images/cc/sa.png">
+      
+      <span>
+        This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.
+      </span>
+    </a>
+  </div>
+
+
+    
+
+  </footer>
+</article>
+
+
+
+
+
+
+
+          <div class="main-footer">
+  
+    © 2016 Kevin&#39;s Blog - Powered by <a href="http://hexo.io" target="_blank">Hexo</a> - Theme <a href="https://github.com/denjones/hexo-theme-chan" target="_blank">Chan</a>
+  
+</div>
+
+      
+        </div>
+      
+    </div>
+  </div>
+  <script src="//apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+
+  <link rel="stylesheet" href="/PhotoSwipe/photoswipe.css">
+  <link rel="stylesheet" href="/PhotoSwipe/default-skin/default-skin.css">
+
+  <!-- Root element of PhotoSwipe. Must have class pswp. -->
+  <div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    <!-- Background of PhotoSwipe.
+             It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+
+      <!-- Container that holds slides.
+                PhotoSwipe keeps only 3 of them in the DOM to save memory.
+                Don't modify these 3 pswp__item elements, data is added later on. -->
+      <div class="pswp__container">
+        <div class="pswp__item"></div>
+        <div class="pswp__item"></div>
+        <div class="pswp__item"></div>
+      </div>
+
+      <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+      <div class="pswp__ui pswp__ui--hidden">
+
+        <div class="pswp__top-bar">
+
+          <!--  Controls are self-explanatory. Order can be changed. -->
+
+          <div class="pswp__counter"></div>
+
+          <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+          <button class="pswp__button pswp__button--share" title="Share"></button>
+
+          <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+          <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+          <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+          <!-- element will get class pswp__preloader--active when preloader is running -->
+          <div class="pswp__preloader">
+            <div class="pswp__preloader__icn">
+              <div class="pswp__preloader__cut">
+                <div class="pswp__preloader__donut"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+          <div class="pswp__share-tooltip"></div>
+        </div>
+
+        <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)"></button>
+
+        <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)"></button>
+
+        <div class="pswp__caption">
+          <div class="pswp__caption__center"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/PhotoSwipe/photoswipe.js"></script>
+  <script src="/PhotoSwipe/photoswipe-ui-default.js"></script>
+
+
+<script src="/perfect-scrollbar/js/min/perfect-scrollbar.min.js"></script>
+<script src="/scripts/main.js"></script>
+
+</body>
+</html>

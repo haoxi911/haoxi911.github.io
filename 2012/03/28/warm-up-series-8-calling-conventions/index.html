@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+
+
+<title>
+  
+    Warm Up Series (8) – Calling Conventions
+  
+</title>
+
+<meta name="description" content="A &amp;quot;calling convention&amp;quot; is the way in which a function is called. The standard __cdecl is what has been used up until now, other common ones are __stdcall, __fastcall, and __thiscall, a less">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Warm Up Series (8) – Calling Conventions">
+<meta property="og:url" content="http://yoursite.com/2012/03/28/warm-up-series-8-calling-conventions/index.html">
+<meta property="og:site_name" content="Kevin's Blog">
+<meta property="og:description" content="A &amp;quot;calling convention&amp;quot; is the way in which a function is called. The standard __cdecl is what has been used up until now, other common ones are __stdcall, __fastcall, and __thiscall, a less">
+<meta property="og:updated_time" content="2016-10-23T13:39:54.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Warm Up Series (8) – Calling Conventions">
+<meta name="twitter:description" content="A &amp;quot;calling convention&amp;quot; is the way in which a function is called. The standard __cdecl is what has been used up until now, other common ones are __stdcall, __fastcall, and __thiscall, a less">
+
+
+  <link rel="alternative" href="/atom.xml" title="Kevin&#39;s Blog" type="application/atom+xml">
+
+
+
+  <link rel="icon" href="/favicon.png">
+
+
+<link rel="stylesheet" href="/perfect-scrollbar/css/perfect-scrollbar.min.css">
+<link rel="stylesheet" href="/styles/main.css">
+
+
+
+
+
+
+</head>
+<body
+  
+    class="monochrome"
+  
+  >
+  <div class="mobile-header">
+  <button class="sidebar-toggle" type="button">
+    <span class="icon-bar"></span>
+    <span class="icon-bar"></span>
+    <span class="icon-bar"></span>
+  </button>
+  <a class="title" href="/">Kevin&#39;s Blog</a>
+</div>
+
+  <div class="main-container">
+    <div class="sidebar">
+  <div class="header">
+    <h1 class="title"><a href="/">Kevin&#39;s Blog</a></h1>
+    
+    <div class="info">
+      <div class="content">
+        
+        
+          <div class="author">Hao Xi</div>
+        
+      </div>
+      
+        <div class="avatar">
+          
+            <a href="/about"><img src="https://cn.gravatar.com/avatar/35fef74d731255cd569c2c2b0b9e87e4?s=200"></a>
+          
+        </div>
+      
+    </div>
+  </div>
+  <div class="body">
+    
+      
+        <ul class="nav">
+          
+            
+              <li class="category-list-container">
+                <a href="javascript:;">Category</a>
+                <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Algorithms/">Algorithms</a><span class="category-list-count">13</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Asp-Net/">Asp.Net</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Basic-Theory/">Basic Theory</a><span class="category-list-count">5</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Default/">Default</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/GNU-Linux/">GNU/Linux</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Interview/">Interview</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Kevin-s-Life/">Kevin's Life</a><span class="category-list-count">9</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Performance/">Performance</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Phone/">Phone</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Programming/">Programming</a><span class="category-list-count">10</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Rework/">Rework</a><span class="category-list-count">1</span></li></ul>
+              </li>
+            
+          
+            
+              <li class="tag-list-container">
+                <a href="javascript:;">Tag</a>
+                <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/2011-Plan/">2011 Plan</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ACM-ICPC/">ACM-ICPC</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ActiveX/">ActiveX</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/AfterLogic/">AfterLogic</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Algorithms/">Algorithms</a><span class="tag-list-count">11</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Android/">Android</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Asp-Net/">Asp.Net</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/BFS/">BFS</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Business/">Business</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/C/">C#</a><span class="tag-list-count">10</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/CLRS/">CLRS</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Concurrent/">Concurrent</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Coverage/">Coverage</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Critical-Section/">Critical Section</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/DFS/">DFS</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Data-Structure/">Data Structure</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Design-Pattern-Series/">Design Pattern Series</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Dovecot/">Dovecot</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Download-Website/">Download Website</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Dream/">Dream</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Email/">Email</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Environment-Variables/">Environment Variables</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/First-Post/">First Post</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Freelance/">Freelance</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/GNOME/">GNOME</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Generic/">Generic</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Happiness/">Happiness</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Heap/">Heap</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/If-You-Are-The-One/">If You Are The One</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Interview/">Interview</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JavaScript/">JavaScript</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JobFinder/">JobFinder</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Josephus/">Josephus</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/KDE/">KDE</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/KMP/">KMP</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Let-The-Bullet-Fly/">Let The Bullet Fly</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Linux/">Linux</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/MSMQ/">MSMQ</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Mac/">Mac</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Management/">Management</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Memory/">Memory</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Monte-Carlo/">Monte Carlo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Movies/">Movies</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Mutex/">Mutex</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/My-Blogs/">My Blogs</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/My-Life/">My Life</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/My-Name/">My Name</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/MySQL/">MySQL</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Ncover/">Ncover</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Nunit/">Nunit</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Old-Boys/">Old Boys</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Online-Judge/">Online Judge</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/OpenMP/">OpenMP</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Parallel-Programming/">Parallel Programming</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Postfix/">Postfix</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Present/">Present</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Primer/">Primer</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Python/">Python</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Queue/">Queue</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Reading/">Reading</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Recursion/">Recursion</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Reverse-Polish-Notation/">Reverse Polish Notation</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Rework/">Rework</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ShengYiJie/">ShengYiJie</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Silverlight/">Silverlight</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Singleton/">Singleton</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Sparse-Matrix/">Sparse Matrix</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Stack/">Stack</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Stirling-s-Formula/">Stirling's Formula</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/String-Matching/">String Matching</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Template/">Template</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Teru-Teru-Bouz/">Teru Teru Bouz</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/The-bright-eleven/">The bright eleven</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Theory/">Theory</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Thread/">Thread</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Trace/">Trace</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Translation/">Translation</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Triple-Table/">Triple Table</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Unit-Test/">Unit Test</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/VPS/">VPS</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Webmail/">Webmail</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Wedding/">Wedding</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Windows/">Windows</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Windows-Phone-7/">Windows Phone 7</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/X-Window/">X Window</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Xml/">Xml</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/iPhone/">iPhone</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vWorker/">vWorker</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/wget/">wget</a><span class="tag-list-count">1</span></li></ul>
+              </li>
+            
+          
+            
+              <li class="archive-list-container">
+                <a href="javascript:;">Archive</a>
+                <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/">2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/">2012</a><span class="archive-list-count">17</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/">2011</a><span class="archive-list-count">8</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/">2010</a><span class="archive-list-count">25</span></li></ul>
+              </li>
+            
+          
+        </ul>
+      
+        <ul class="nav">
+          
+            
+              <li>
+                <a href="/" title="Homepage">Homepage</a>
+              </li>
+            
+          
+            
+              <li>
+                <a href="/archives" title="By Year">By Year</a>
+              </li>
+            
+          
+        </ul>
+      
+        <ul class="nav">
+          
+            
+              <li>
+                <a href="https://github.com/denjones/hexo-theme-chan" title="Chan" target="_blank" rel="external">Chan</a>
+              </li>
+            
+          
+            
+              <li>
+                <a href="https://github.com/denjones" title="Github" target="_blank" rel="external">Github</a>
+              </li>
+            
+          
+            
+              <li>
+                <a href="/atom.xml" title="RSS">RSS</a>
+              </li>
+            
+          
+        </ul>
+      
+    
+  </div>
+</div>
+
+    <div class="main-content">
+      
+        <div style="max-width: 1000px">
+      
+          <article id="post-warm-up-series-8-calling-conventions" class="article article-type-post">
+  
+    <h1 class="article-header">
+      Warm Up Series (8) – Calling Conventions
+    </h1>
+  
+  
+
+  <div class="article-info">
+    <span class="article-date">
+  2012-03-28
+</span>
+
+    
+	<span class="article-category tagcloud">
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/Basic-Theory/">Basic Theory</a><ul class="article-category-list-child"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/Basic-Theory/Programming/">Programming</a><ul class="article-category-list-child"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/Basic-Theory/Programming/Warm-Up/">Warm Up</a></li></ul></li></ul></li></ul>
+	</span>
+
+
+    
+	<span class="article-tag tagcloud">
+		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/C/">C#</a></li></ul>
+	</span>
+
+
+  </div>
+  <div class="article-entry">
+    <p>A &quot;calling convention&quot; is the way in which a function is called. The standard <font><font><font size="2"><em><font face="Courier New">__cdecl</font></em></font></font></font> is what has been used up until now, other common ones are <em><font size="2" face="Courier New">__stdcall</font></em>, <em><font size="2" face="Courier New">__fastcall</font></em>, and <em><font size="2" face="Courier New">__thiscall</font></em>, a less common convention used when writing hacks is <em><font size="2" face="Courier New">__declspec(naked)</font></em>.</p>
+<h4 id="cdecl-is-the-default-calling-convention-on-most-C-compilers-The-properties-are-as-follows"><a href="#cdecl-is-the-default-calling-convention-on-most-C-compilers-The-properties-are-as-follows" class="headerlink" title="__cdecl is the default calling convention on most C compilers. The properties are as follows:"></a><font><font size="2"><em><font face="Courier New">__cdecl</font></em></font></font> is the default calling convention on most C compilers. The properties are as follows:</h4><ul>
+<li>The caller places all the parameters on the stack*   The caller removes the parameters from the stack (often by adding the total size added to the stack pointer)  </li>
+</ul>
+<p><em><font size="2" face="Courier New">__stdcall</font></em> is another common calling convention. The properties are:</p>
+<ul>
+<li><p>The caller places all the parameters on the stack*   The called function removes the parameters from the stack, often by using the return instruction with a parameter equal to the number of parameters, &quot;ret xx&quot;  </p>
+<p><pre><font size="4"></font></pre><br>The most useful part about <em><font size="2" face="Courier New">__stdcall</font></em> is that it tells a reverse engineer how many parameters are passed to any given function. In cases where no examples of the function being called may be found (possibly because it’s an exported DLL function), it is easier to check the return than to enumerate local variables.</p>
+</li>
+</ul>
+<h4 id="fastcall-is-the-final-common-calling-convention-seen-All-implementations-of-fastcall-pass-parameters-in-registers-although-Microsoft-and-Borland-for-example-use-different-registers-Here-are-the-properties-of-Microsoft’s-fastcall-implementation"><a href="#fastcall-is-the-final-common-calling-convention-seen-All-implementations-of-fastcall-pass-parameters-in-registers-although-Microsoft-and-Borland-for-example-use-different-registers-Here-are-the-properties-of-Microsoft’s-fastcall-implementation" class="headerlink" title="__fastcall is the final common calling convention seen. All implementations of __fastcall pass parameters in registers, although Microsoft and Borland, for example, use different registers. Here are the properties of Microsoft’s __fastcall implementation:"></a><em><font size="2" face="Courier New">__fastcall</font></em> is the final common calling convention seen. All implementations of <em><font size="2" face="Courier New">__fastcall</font></em> pass parameters in registers, although Microsoft and Borland, for example, use different registers. Here are the properties of Microsoft’s <em><font size="2" face="Courier New">__fastcall</font></em> implementation:</h4><ul>
+<li>First two parameters are passed in ecx and edx, respectively<em>   Third parameter and on are passed on the stack, as usual</em>   Functions clean up their own stack, if necessary</li>
+</ul>
+<p>Recognizing a <em><font size="2" face="Courier New">__fastcall</font></em> function is easy: look for ecx and edx being used without being initialized in a function.</p>
+<p>A <em><font size="2" face="Courier New">__fastcall</font></em> with no parameters is identical to <font><font size="2"><em><font face="Courier New">__cdecl</font></em></font></font> and <em><font size="2" face="Courier New">__stdcall</font></em> with no parameters, and a <em><font size="2" face="Courier New">__fastcall</font></em> with a single parameter looks like <em><font size="2" face="Courier New">__thiscall</font></em>.</p>
+<p>  <pre><font size="4"></font></pre><br>  <font size="2" face="Courier New"><font face="Verdana"></font><strong><em>thiscall</em></strong></font> is very similar to _<font size="2" face="Courier New">stdcall</font>_, except that a pointer to the class whose member is being called is passed in ecx.</p>
+<ul>
+<li><p>ecx is assigned a pointer to the class whose member is being called<em>   The parameters are placed on the stack, the same as <em><font size="2" face="Courier New">__stdcall</font></em></em>   The function cleans itself up, the same as <em><font size="2" face="Courier New">__stdcall</font></em></p>
+<p><pre><font size="4"></font></pre><br><em><font size="2" face="Courier New">__declspec(naked)</font></em> is a Visual Studio-specific convention, can’t really be identified in assembly, since it’s identical to <font><font size="2"><em><font face="Courier New">__cdecl</font></em></font></font> once it reaches assembly. However, the special property of this convention is that the compiler will generate no code in a function. This allows the program, in a __asm{} block, to write everything from preserving registers to allocating local variables and returning. This is useful when patching a jump in the middle of code, since it prevents the function from changing registers without the programmer’s knowledge.</p>
+</li>
+</ul>
+
+  </div>
+  <footer class="article-footer">
+    
+  <div class="cc">
+    <a href="http://creativecommons.org/licenses/by-sa/4.0/deed.e" target="_blank" title="Attribution-ShareAlike">
+      <img src="/images/cc/cc.png">
+      
+          <img src="/images/cc/by.png">
+        
+          <img src="/images/cc/sa.png">
+      
+      <span>
+        This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.
+      </span>
+    </a>
+  </div>
+
+
+    
+
+  </footer>
+</article>
+
+
+
+
+
+
+
+          <div class="main-footer">
+  
+    © 2016 Kevin&#39;s Blog - Powered by <a href="http://hexo.io" target="_blank">Hexo</a> - Theme <a href="https://github.com/denjones/hexo-theme-chan" target="_blank">Chan</a>
+  
+</div>
+
+      
+        </div>
+      
+    </div>
+  </div>
+  <script src="//apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+
+  <link rel="stylesheet" href="/PhotoSwipe/photoswipe.css">
+  <link rel="stylesheet" href="/PhotoSwipe/default-skin/default-skin.css">
+
+  <!-- Root element of PhotoSwipe. Must have class pswp. -->
+  <div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    <!-- Background of PhotoSwipe.
+             It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+
+      <!-- Container that holds slides.
+                PhotoSwipe keeps only 3 of them in the DOM to save memory.
+                Don't modify these 3 pswp__item elements, data is added later on. -->
+      <div class="pswp__container">
+        <div class="pswp__item"></div>
+        <div class="pswp__item"></div>
+        <div class="pswp__item"></div>
+      </div>
+
+      <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+      <div class="pswp__ui pswp__ui--hidden">
+
+        <div class="pswp__top-bar">
+
+          <!--  Controls are self-explanatory. Order can be changed. -->
+
+          <div class="pswp__counter"></div>
+
+          <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+          <button class="pswp__button pswp__button--share" title="Share"></button>
+
+          <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+          <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+          <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+          <!-- element will get class pswp__preloader--active when preloader is running -->
+          <div class="pswp__preloader">
+            <div class="pswp__preloader__icn">
+              <div class="pswp__preloader__cut">
+                <div class="pswp__preloader__donut"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+          <div class="pswp__share-tooltip"></div>
+        </div>
+
+        <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)"></button>
+
+        <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)"></button>
+
+        <div class="pswp__caption">
+          <div class="pswp__caption__center"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/PhotoSwipe/photoswipe.js"></script>
+  <script src="/PhotoSwipe/photoswipe-ui-default.js"></script>
+
+
+<script src="/perfect-scrollbar/js/min/perfect-scrollbar.min.js"></script>
+<script src="/scripts/main.js"></script>
+
+</body>
+</html>

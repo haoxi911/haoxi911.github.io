@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+
+
+<title>
+  
+    Warm Up Series (3) – Dynamic Memory Allocation
+  
+</title>
+
+<meta name="description" content="在摘抄完第二篇文章后，我又在国外的C编程网站上看到了关于内存管理的系列文章，自认为比从国内论坛上东拼西凑出一套结论更有说服力，故摘抄和翻译部分内容如下：
+&amp;#160;
+1. 高级内存管理（Advanced Memory Management ）在C++中不提倡使用void指针，在使用多层继承时，基类中对不同子类对象看到的值可能是不一样的（多态，基类指针位置相同，但对象大小的偏移不同）。如果使用vo">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Warm Up Series (3) – Dynamic Memory Allocation">
+<meta property="og:url" content="http://yoursite.com/2012/03/04/warm-up-series-3-dynamic-memory-allocation/index.html">
+<meta property="og:site_name" content="Kevin's Blog">
+<meta property="og:description" content="在摘抄完第二篇文章后，我又在国外的C编程网站上看到了关于内存管理的系列文章，自认为比从国内论坛上东拼西凑出一套结论更有说服力，故摘抄和翻译部分内容如下：
+&amp;#160;
+1. 高级内存管理（Advanced Memory Management ）在C++中不提倡使用void指针，在使用多层继承时，基类中对不同子类对象看到的值可能是不一样的（多态，基类指针位置相同，但对象大小的偏移不同）。如果使用vo">
+<meta property="og:image" content="http://kevinxi.files.wordpress.com/2012/03/image_thumb.png">
+<meta property="og:image" content="http://kevinxi.files.wordpress.com/2012/03/image_thumb1.png">
+<meta property="og:updated_time" content="2016-10-23T13:39:54.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Warm Up Series (3) – Dynamic Memory Allocation">
+<meta name="twitter:description" content="在摘抄完第二篇文章后，我又在国外的C编程网站上看到了关于内存管理的系列文章，自认为比从国内论坛上东拼西凑出一套结论更有说服力，故摘抄和翻译部分内容如下：
+&amp;#160;
+1. 高级内存管理（Advanced Memory Management ）在C++中不提倡使用void指针，在使用多层继承时，基类中对不同子类对象看到的值可能是不一样的（多态，基类指针位置相同，但对象大小的偏移不同）。如果使用vo">
+<meta name="twitter:image" content="http://kevinxi.files.wordpress.com/2012/03/image_thumb.png">
+
+
+  <link rel="alternative" href="/atom.xml" title="Kevin&#39;s Blog" type="application/atom+xml">
+
+
+
+  <link rel="icon" href="/favicon.png">
+
+
+<link rel="stylesheet" href="/perfect-scrollbar/css/perfect-scrollbar.min.css">
+<link rel="stylesheet" href="/styles/main.css">
+
+
+
+
+
+
+</head>
+<body
+  
+    class="monochrome"
+  
+  >
+  <div class="mobile-header">
+  <button class="sidebar-toggle" type="button">
+    <span class="icon-bar"></span>
+    <span class="icon-bar"></span>
+    <span class="icon-bar"></span>
+  </button>
+  <a class="title" href="/">Kevin&#39;s Blog</a>
+</div>
+
+  <div class="main-container">
+    <div class="sidebar">
+  <div class="header">
+    <h1 class="title"><a href="/">Kevin&#39;s Blog</a></h1>
+    
+    <div class="info">
+      <div class="content">
+        
+        
+          <div class="author">Hao Xi</div>
+        
+      </div>
+      
+        <div class="avatar">
+          
+            <a href="/about"><img src="https://cn.gravatar.com/avatar/35fef74d731255cd569c2c2b0b9e87e4?s=200"></a>
+          
+        </div>
+      
+    </div>
+  </div>
+  <div class="body">
+    
+      
+        <ul class="nav">
+          
+            
+              <li class="category-list-container">
+                <a href="javascript:;">Category</a>
+                <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Algorithms/">Algorithms</a><span class="category-list-count">13</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Asp-Net/">Asp.Net</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Basic-Theory/">Basic Theory</a><span class="category-list-count">5</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Default/">Default</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/GNU-Linux/">GNU/Linux</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Interview/">Interview</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Kevin-s-Life/">Kevin's Life</a><span class="category-list-count">9</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Performance/">Performance</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Phone/">Phone</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Programming/">Programming</a><span class="category-list-count">10</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Rework/">Rework</a><span class="category-list-count">1</span></li></ul>
+              </li>
+            
+          
+            
+              <li class="tag-list-container">
+                <a href="javascript:;">Tag</a>
+                <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/2011-Plan/">2011 Plan</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ACM-ICPC/">ACM-ICPC</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ActiveX/">ActiveX</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/AfterLogic/">AfterLogic</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Algorithms/">Algorithms</a><span class="tag-list-count">11</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Android/">Android</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Asp-Net/">Asp.Net</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/BFS/">BFS</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Business/">Business</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/C/">C#</a><span class="tag-list-count">10</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/CLRS/">CLRS</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Concurrent/">Concurrent</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Coverage/">Coverage</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Critical-Section/">Critical Section</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/DFS/">DFS</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Data-Structure/">Data Structure</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Design-Pattern-Series/">Design Pattern Series</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Dovecot/">Dovecot</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Download-Website/">Download Website</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Dream/">Dream</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Email/">Email</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Environment-Variables/">Environment Variables</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/First-Post/">First Post</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Freelance/">Freelance</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/GNOME/">GNOME</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Generic/">Generic</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Happiness/">Happiness</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Heap/">Heap</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/If-You-Are-The-One/">If You Are The One</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Interview/">Interview</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JavaScript/">JavaScript</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JobFinder/">JobFinder</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Josephus/">Josephus</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/KDE/">KDE</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/KMP/">KMP</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Let-The-Bullet-Fly/">Let The Bullet Fly</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Linux/">Linux</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/MSMQ/">MSMQ</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Mac/">Mac</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Management/">Management</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Memory/">Memory</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Monte-Carlo/">Monte Carlo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Movies/">Movies</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Mutex/">Mutex</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/My-Blogs/">My Blogs</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/My-Life/">My Life</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/My-Name/">My Name</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/MySQL/">MySQL</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Ncover/">Ncover</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Nunit/">Nunit</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Old-Boys/">Old Boys</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Online-Judge/">Online Judge</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/OpenMP/">OpenMP</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Parallel-Programming/">Parallel Programming</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Postfix/">Postfix</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Present/">Present</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Primer/">Primer</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Python/">Python</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Queue/">Queue</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Reading/">Reading</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Recursion/">Recursion</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Reverse-Polish-Notation/">Reverse Polish Notation</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Rework/">Rework</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ShengYiJie/">ShengYiJie</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Silverlight/">Silverlight</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Singleton/">Singleton</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Sparse-Matrix/">Sparse Matrix</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Stack/">Stack</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Stirling-s-Formula/">Stirling's Formula</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/String-Matching/">String Matching</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Template/">Template</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Teru-Teru-Bouz/">Teru Teru Bouz</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/The-bright-eleven/">The bright eleven</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Theory/">Theory</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Thread/">Thread</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Trace/">Trace</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Translation/">Translation</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Triple-Table/">Triple Table</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Unit-Test/">Unit Test</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/VPS/">VPS</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Webmail/">Webmail</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Wedding/">Wedding</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Windows/">Windows</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Windows-Phone-7/">Windows Phone 7</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/X-Window/">X Window</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Xml/">Xml</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/iPhone/">iPhone</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vWorker/">vWorker</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/wget/">wget</a><span class="tag-list-count">1</span></li></ul>
+              </li>
+            
+          
+            
+              <li class="archive-list-container">
+                <a href="javascript:;">Archive</a>
+                <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/">2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/">2012</a><span class="archive-list-count">17</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/">2011</a><span class="archive-list-count">8</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/">2010</a><span class="archive-list-count">25</span></li></ul>
+              </li>
+            
+          
+        </ul>
+      
+        <ul class="nav">
+          
+            
+              <li>
+                <a href="/" title="Homepage">Homepage</a>
+              </li>
+            
+          
+            
+              <li>
+                <a href="/archives" title="By Year">By Year</a>
+              </li>
+            
+          
+        </ul>
+      
+        <ul class="nav">
+          
+            
+              <li>
+                <a href="https://github.com/denjones/hexo-theme-chan" title="Chan" target="_blank" rel="external">Chan</a>
+              </li>
+            
+          
+            
+              <li>
+                <a href="https://github.com/denjones" title="Github" target="_blank" rel="external">Github</a>
+              </li>
+            
+          
+            
+              <li>
+                <a href="/atom.xml" title="RSS">RSS</a>
+              </li>
+            
+          
+        </ul>
+      
+    
+  </div>
+</div>
+
+    <div class="main-content">
+      
+        <div style="max-width: 1000px">
+      
+          <article id="post-warm-up-series-3-dynamic-memory-allocation" class="article article-type-post">
+  
+    <h1 class="article-header">
+      Warm Up Series (3) – Dynamic Memory Allocation
+    </h1>
+  
+  
+
+  <div class="article-info">
+    <span class="article-date">
+  2012-03-04
+</span>
+
+    
+	<span class="article-category tagcloud">
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/Programming/">Programming</a><ul class="article-category-list-child"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/Programming/Warm-Up/">Warm Up</a></li></ul></li></ul>
+	</span>
+
+
+    
+	<span class="article-tag tagcloud">
+		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/C/">C#</a></li></ul>
+	</span>
+
+
+  </div>
+  <div class="article-entry">
+    <p>在摘抄完<a href="http://kevinxi.wordpress.com/2012/03/02/warm-up-series-2-process-memory-allocation/" target="_blank" rel="external">第二篇文章</a>后，我又在国外的<a href="http://www.cprogramming.com" target="_blank" rel="external">C编程网站</a>上看到了关于内存管理的系列文章，自认为比从国内论坛上东拼西凑出一套结论更有说服力，故摘抄和翻译部分内容如下：</p>
+<p>&#160;</p>
+<p>1. 高级内存管理（<a href="http://www.cprogramming.com/tutorial/dynamic_memory_allocation.html" target="_blank" rel="external"><font size="1">Advanced Memory Management</font></a> ）<br>在C++中不提倡使用void<em>指针，在使用多层继承时，基类中对不同子类对象看到的值可能是不一样的（多态，基类指针位置相同，但对象大小的偏移不同）。如果使用void</em>指针，则会破坏C++的多态性，这里应尽早使用dynamic_cast或者static_cast自动纠正指针指向的数据。</p>
+<p>使用new[]将动态分配整数组的目标对象的内存，并调用该对象的默认构造函数，返回第一个对象的指针；使用new[]操作符时，只能够使用默认构造函数，无法调用带参数的构造函数。</p>
+<p>&#160;</p>
+<p>2. 动态内存分配和虚拟内存（<a href="http://www.cprogramming.com/tutorial/virtual_memory_and_heaps.html" target="_blank" rel="external"><font size="1">Dynamic Memory Allocation and Virtual Memory</font></a> ）</p>
+<p>一般来说，每个进程的内存地址空间可以分为6个部分：环境区，用于保存环境变量和命令行参数；栈区，用于保存函数参数、返回值、内部变量等；堆区（自由存储区），用于动态分配内存；未初始化的静态或全局变量；初始化的静态或全局变量；代码区，加载代码的区域。</p>
+<p><a href="http://kevinxi.files.wordpress.com/2012/03/image.png" target="_blank" rel="external"><img src="http://kevinxi.files.wordpress.com/2012/03/image_thumb.png" alt="image" title="image"></a></p>
+<p>堆区实质上是一块连续的有碎片的内存区域。当程序请求动态内存时，系统从堆区剩余未分配的内存空间中，查找满足要求的连续内存块，并返回找到的内存区域的指针。对于堆区内存分配的算法，有的是遍历空余内存并找出最小的满足要求的内存块，有的是找出第一个满足要求的内存块。通常，系统会维护一个空闲内存的二叉数，方便快速的发现和合理分配内存。</p>
+<p><a href="http://kevinxi.files.wordpress.com/2012/03/image1.png" target="_blank" rel="external"><img src="http://kevinxi.files.wordpress.com/2012/03/image_thumb1.png" alt="image" title="image"></a>    </p>
+<p>3. 用new/delete自定义内存分配（<a href="http://www.cprogramming.com/tutorial/operator_new.html" target="_blank" rel="external"><font size="1">Customized Allocators with Operator New and Operator Delete</font></a> ）</p>
+<p>假设你有一个链表，并且你希望提高节点内存分配的速度。那么一种可行的方法是维护一组已经被删除的节点，并且在需要添加新节点的时候重用它们的内存。在此前提下，我们可以重载new运算符，并且试图从删除的节点列表中找到可重用的节点，只有当删除的节点列表为空时，我们再真正的动态申请内存。而delete运算符则简单的将节点加入删除的节点列表中。</p>
+<p>另一个重载new/delete运算符的应用是实现内存的垃圾回收，你可以实现一套类似与Java或者C#的内存回收器，这样，当你分配的内存不再被使用时，可以被自动的回收。</p>
+<p>&#160;</p>
+<p>4. C++常见内存管理问题（<a href="http://www.cprogramming.com/tutorial/c++_memory_problems.html" target="_blank" rel="external"><font size="1">Common Memory Management Problems in C++</font></a>）</p>
+<p>这篇文章主要提供了一些检查内存泄露的工具，比如IBM的<a href="http://www-01.ibm.com/software/awdtools/purify/" target="_blank" rel="external">Purify</a>，以及建议使用自定义堆或者智能指针（标准库里面的auto_ptr）来防止内存泄露。</p>
+
+  </div>
+  <footer class="article-footer">
+    
+  <div class="cc">
+    <a href="http://creativecommons.org/licenses/by-sa/4.0/deed.e" target="_blank" title="Attribution-ShareAlike">
+      <img src="/images/cc/cc.png">
+      
+          <img src="/images/cc/by.png">
+        
+          <img src="/images/cc/sa.png">
+      
+      <span>
+        This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.
+      </span>
+    </a>
+  </div>
+
+
+    
+
+  </footer>
+</article>
+
+
+
+
+
+
+
+          <div class="main-footer">
+  
+    © 2016 Kevin&#39;s Blog - Powered by <a href="http://hexo.io" target="_blank">Hexo</a> - Theme <a href="https://github.com/denjones/hexo-theme-chan" target="_blank">Chan</a>
+  
+</div>
+
+      
+        </div>
+      
+    </div>
+  </div>
+  <script src="//apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+
+  <link rel="stylesheet" href="/PhotoSwipe/photoswipe.css">
+  <link rel="stylesheet" href="/PhotoSwipe/default-skin/default-skin.css">
+
+  <!-- Root element of PhotoSwipe. Must have class pswp. -->
+  <div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    <!-- Background of PhotoSwipe.
+             It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+
+      <!-- Container that holds slides.
+                PhotoSwipe keeps only 3 of them in the DOM to save memory.
+                Don't modify these 3 pswp__item elements, data is added later on. -->
+      <div class="pswp__container">
+        <div class="pswp__item"></div>
+        <div class="pswp__item"></div>
+        <div class="pswp__item"></div>
+      </div>
+
+      <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+      <div class="pswp__ui pswp__ui--hidden">
+
+        <div class="pswp__top-bar">
+
+          <!--  Controls are self-explanatory. Order can be changed. -->
+
+          <div class="pswp__counter"></div>
+
+          <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+          <button class="pswp__button pswp__button--share" title="Share"></button>
+
+          <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+          <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+          <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+          <!-- element will get class pswp__preloader--active when preloader is running -->
+          <div class="pswp__preloader">
+            <div class="pswp__preloader__icn">
+              <div class="pswp__preloader__cut">
+                <div class="pswp__preloader__donut"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+          <div class="pswp__share-tooltip"></div>
+        </div>
+
+        <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)"></button>
+
+        <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)"></button>
+
+        <div class="pswp__caption">
+          <div class="pswp__caption__center"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/PhotoSwipe/photoswipe.js"></script>
+  <script src="/PhotoSwipe/photoswipe-ui-default.js"></script>
+
+
+<script src="/perfect-scrollbar/js/min/perfect-scrollbar.min.js"></script>
+<script src="/scripts/main.js"></script>
+
+</body>
+</html>

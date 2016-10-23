@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+
+
+<title>
+  
+    Sparse Matrix With Triple Table
+  
+</title>
+
+<meta name="description" content="1. 稀疏矩阵的三元组表示：row|column|value2. 三元组的稀疏矩阵的转置：将row和column对换并排序
+
+Terms：矩阵中非零元素的个数
+Rows：原矩阵的行数
+Cols：原矩阵的列数
+rowSize：存放原稀疏矩阵各列的非零元素个数
+rowStart：存放转置矩阵各行非零元素的起始保存位置template&amp;lt;class Type&amp;gt; SparseMatrix&amp;lt;">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Sparse Matrix With Triple Table">
+<meta property="og:url" content="http://yoursite.com/2010/12/25/sparse-matrix-with-triple-table/index.html">
+<meta property="og:site_name" content="Kevin's Blog">
+<meta property="og:description" content="1. 稀疏矩阵的三元组表示：row|column|value2. 三元组的稀疏矩阵的转置：将row和column对换并排序
+
+Terms：矩阵中非零元素的个数
+Rows：原矩阵的行数
+Cols：原矩阵的列数
+rowSize：存放原稀疏矩阵各列的非零元素个数
+rowStart：存放转置矩阵各行非零元素的起始保存位置template&amp;lt;class Type&amp;gt; SparseMatrix&amp;lt;">
+<meta property="og:updated_time" content="2016-10-23T13:39:54.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Sparse Matrix With Triple Table">
+<meta name="twitter:description" content="1. 稀疏矩阵的三元组表示：row|column|value2. 三元组的稀疏矩阵的转置：将row和column对换并排序
+
+Terms：矩阵中非零元素的个数
+Rows：原矩阵的行数
+Cols：原矩阵的列数
+rowSize：存放原稀疏矩阵各列的非零元素个数
+rowStart：存放转置矩阵各行非零元素的起始保存位置template&amp;lt;class Type&amp;gt; SparseMatrix&amp;lt;">
+
+
+  <link rel="alternative" href="/atom.xml" title="Kevin&#39;s Blog" type="application/atom+xml">
+
+
+
+  <link rel="icon" href="/favicon.png">
+
+
+<link rel="stylesheet" href="/perfect-scrollbar/css/perfect-scrollbar.min.css">
+<link rel="stylesheet" href="/styles/main.css">
+
+
+
+
+
+
+</head>
+<body
+  
+    class="monochrome"
+  
+  >
+  <div class="mobile-header">
+  <button class="sidebar-toggle" type="button">
+    <span class="icon-bar"></span>
+    <span class="icon-bar"></span>
+    <span class="icon-bar"></span>
+  </button>
+  <a class="title" href="/">Kevin&#39;s Blog</a>
+</div>
+
+  <div class="main-container">
+    <div class="sidebar">
+  <div class="header">
+    <h1 class="title"><a href="/">Kevin&#39;s Blog</a></h1>
+    
+    <div class="info">
+      <div class="content">
+        
+        
+          <div class="author">Hao Xi</div>
+        
+      </div>
+      
+        <div class="avatar">
+          
+            <a href="/about"><img src="https://cn.gravatar.com/avatar/35fef74d731255cd569c2c2b0b9e87e4?s=200"></a>
+          
+        </div>
+      
+    </div>
+  </div>
+  <div class="body">
+    
+      
+        <ul class="nav">
+          
+            
+              <li class="category-list-container">
+                <a href="javascript:;">Category</a>
+                <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Algorithms/">Algorithms</a><span class="category-list-count">13</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Asp-Net/">Asp.Net</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Basic-Theory/">Basic Theory</a><span class="category-list-count">5</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Default/">Default</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/GNU-Linux/">GNU/Linux</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Interview/">Interview</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Kevin-s-Life/">Kevin's Life</a><span class="category-list-count">9</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Performance/">Performance</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Phone/">Phone</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Programming/">Programming</a><span class="category-list-count">10</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Rework/">Rework</a><span class="category-list-count">1</span></li></ul>
+              </li>
+            
+          
+            
+              <li class="tag-list-container">
+                <a href="javascript:;">Tag</a>
+                <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/2011-Plan/">2011 Plan</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ACM-ICPC/">ACM-ICPC</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ActiveX/">ActiveX</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/AfterLogic/">AfterLogic</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Algorithms/">Algorithms</a><span class="tag-list-count">11</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Android/">Android</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Asp-Net/">Asp.Net</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/BFS/">BFS</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Business/">Business</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/C/">C#</a><span class="tag-list-count">10</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/CLRS/">CLRS</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Concurrent/">Concurrent</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Coverage/">Coverage</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Critical-Section/">Critical Section</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/DFS/">DFS</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Data-Structure/">Data Structure</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Design-Pattern-Series/">Design Pattern Series</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Dovecot/">Dovecot</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Download-Website/">Download Website</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Dream/">Dream</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Email/">Email</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Environment-Variables/">Environment Variables</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/First-Post/">First Post</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Freelance/">Freelance</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/GNOME/">GNOME</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Generic/">Generic</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Happiness/">Happiness</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Heap/">Heap</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/If-You-Are-The-One/">If You Are The One</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Interview/">Interview</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JavaScript/">JavaScript</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JobFinder/">JobFinder</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Josephus/">Josephus</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/KDE/">KDE</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/KMP/">KMP</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Let-The-Bullet-Fly/">Let The Bullet Fly</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Linux/">Linux</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/MSMQ/">MSMQ</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Mac/">Mac</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Management/">Management</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Memory/">Memory</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Monte-Carlo/">Monte Carlo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Movies/">Movies</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Mutex/">Mutex</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/My-Blogs/">My Blogs</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/My-Life/">My Life</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/My-Name/">My Name</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/MySQL/">MySQL</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Ncover/">Ncover</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Nunit/">Nunit</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Old-Boys/">Old Boys</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Online-Judge/">Online Judge</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/OpenMP/">OpenMP</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Parallel-Programming/">Parallel Programming</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Postfix/">Postfix</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Present/">Present</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Primer/">Primer</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Python/">Python</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Queue/">Queue</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Reading/">Reading</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Recursion/">Recursion</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Reverse-Polish-Notation/">Reverse Polish Notation</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Rework/">Rework</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ShengYiJie/">ShengYiJie</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Silverlight/">Silverlight</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Singleton/">Singleton</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Sparse-Matrix/">Sparse Matrix</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Stack/">Stack</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Stirling-s-Formula/">Stirling's Formula</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/String-Matching/">String Matching</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Template/">Template</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Teru-Teru-Bouz/">Teru Teru Bouz</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/The-bright-eleven/">The bright eleven</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Theory/">Theory</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Thread/">Thread</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Trace/">Trace</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Translation/">Translation</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Triple-Table/">Triple Table</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Unit-Test/">Unit Test</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/VPS/">VPS</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Webmail/">Webmail</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Wedding/">Wedding</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Windows/">Windows</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Windows-Phone-7/">Windows Phone 7</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/X-Window/">X Window</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Xml/">Xml</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/iPhone/">iPhone</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vWorker/">vWorker</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/wget/">wget</a><span class="tag-list-count">1</span></li></ul>
+              </li>
+            
+          
+            
+              <li class="archive-list-container">
+                <a href="javascript:;">Archive</a>
+                <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/">2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/">2012</a><span class="archive-list-count">17</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/">2011</a><span class="archive-list-count">8</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/">2010</a><span class="archive-list-count">25</span></li></ul>
+              </li>
+            
+          
+        </ul>
+      
+        <ul class="nav">
+          
+            
+              <li>
+                <a href="/" title="Homepage">Homepage</a>
+              </li>
+            
+          
+            
+              <li>
+                <a href="/archives" title="By Year">By Year</a>
+              </li>
+            
+          
+        </ul>
+      
+        <ul class="nav">
+          
+            
+              <li>
+                <a href="https://github.com/denjones/hexo-theme-chan" title="Chan" target="_blank" rel="external">Chan</a>
+              </li>
+            
+          
+            
+              <li>
+                <a href="https://github.com/denjones" title="Github" target="_blank" rel="external">Github</a>
+              </li>
+            
+          
+            
+              <li>
+                <a href="/atom.xml" title="RSS">RSS</a>
+              </li>
+            
+          
+        </ul>
+      
+    
+  </div>
+</div>
+
+    <div class="main-content">
+      
+        <div style="max-width: 1000px">
+      
+          <article id="post-sparse-matrix-with-triple-table" class="article article-type-post">
+  
+    <h1 class="article-header">
+      Sparse Matrix With Triple Table
+    </h1>
+  
+  
+
+  <div class="article-info">
+    <span class="article-date">
+  2010-12-25
+</span>
+
+    
+	<span class="article-category tagcloud">
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/Algorithms/">Algorithms</a><ul class="article-category-list-child"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/Algorithms/Programming/">Programming</a></li></ul></li></ul>
+	</span>
+
+
+    
+	<span class="article-tag tagcloud">
+		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Data-Structure/">Data Structure</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Sparse-Matrix/">Sparse Matrix</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Triple-Table/">Triple Table</a></li></ul>
+	</span>
+
+
+  </div>
+  <div class="article-entry">
+    <p>1. 稀疏矩阵的三元组表示：row|column|value<br>2. 三元组的稀疏矩阵的转置：将row和column对换并排序</p>
+<ul>
+<li>Terms：矩阵中非零元素的个数</li>
+<li>Rows：原矩阵的行数</li>
+<li>Cols：原矩阵的列数</li>
+<li>rowSize：存放原稀疏矩阵各列的非零元素个数</li>
+<li>rowStart：存放转置矩阵各行非零元素的起始保存位置<br><div id="codeSnippetWrapper" style="text-align:left;line-height:12pt;background-color:#f4f4f4;width:97.5%;font-family:'Courier New', courier, monospace;direction:ltr;max-height:200px;font-size:8pt;overflow:auto;cursor:text;border:silver 1px solid;margin:20px 0 10px;padding:4px;"><br><div id="codeSnippet" style="text-align:left;line-height:12pt;background-color:#f4f4f4;width:100%;font-family:'Courier New', courier, monospace;direction:ltr;color:black;font-size:8pt;overflow:visible;border-style:none;padding:0;"><br><pre style="text-align:left;line-height:12pt;background-color:white;width:100%;"><span style="color:#0000ff;">template</span>&lt;<span style="color:#0000ff;">class</span> Type&gt; SparseMatrix&lt;Type&gt; SparseMatrix&lt;Type&gt;::FastTranpos(){</pre><!--CRLF-->
+<pre style="text-align:left;line-height:12pt;background-color:#f4f4f4;width:100%;">        <span style="color:#0000ff;">int</span> *rowSize = <span style="color:#0000ff;">new</span> <span style="color:#0000ff;">int</span>[Cols];</pre><!--CRLF-->
+<pre style="text-align:left;line-height:12pt;background-color:white;width:100%;">        <span style="color:#0000ff;">int</span> *rowStart = <span style="color:#0000ff;">new</span> <span style="color:#0000ff;">int</span>[Cols];</pre><!--CRLF-->
+<pre style="text-align:left;line-height:12pt;background-color:#f4f4f4;width:100%;">        SparseMatrix&lt;Type&gt; b(Cols,Rows);</pre><!--CRLF-->
+<pre style="text-align:left;line-height:12pt;background-color:white;width:100%;">        b.Rows = Cols;b.Cols = Rows;b.Terms = Terms;</pre><!--CRLF-->
+<pre style="text-align:left;line-height:12pt;background-color:#f4f4f4;width:100%;">        <span style="color:#0000ff;">if</span>(Terms &gt; 0){</pre><!--CRLF-->
+<pre style="text-align:left;line-height:12pt;background-color:white;width:100%;">            <span style="color:#0000ff;">for</span>(<span style="color:#0000ff;">int</span> i=0;i&lt;Cols;i++) rowSize[i]=0;</pre><!--CRLF-->
+<pre style="text-align:left;line-height:12pt;background-color:#f4f4f4;width:100%;">            <span style="color:#0000ff;">for</span>(i=0;i&lt;Terms;i++) rowSize[smArray[i].col]++;</pre><!--CRLF-->
+<pre style="text-align:left;line-height:12pt;background-color:white;width:100%;">            rowStart[0]=0;</pre><!--CRLF-->
+<pre style="text-align:left;line-height:12pt;background-color:#f4f4f4;width:100%;">            <span style="color:#0000ff;">for</span>(i=1;i&lt;Cols;i++) rowStart[i]=rowStart[i-1]+rowSize[i-1];</pre><!--CRLF-->
+</div></div></li>
+</ul>
+<!--CRLF-->
+<p><pre style="text-align:left;line-height:12pt;background-color:#f4f4f4;width:100%;">            <span style="color:#0000ff;">for</span>(i=0;i&lt;Terms;i++){</pre><br><!--CRLF--></p>
+<p><pre style="text-align:left;line-height:12pt;background-color:white;width:100%;">                <span style="color:#0000ff;">int</span> j = rowStart[smArray[i].col];</pre><br><!--CRLF--></p>
+<p><pre style="text-align:left;line-height:12pt;background-color:#f4f4f4;width:100%;">                b.smArray[j].row = smArray[i].col;</pre><br><!--CRLF--></p>
+<p><pre style="text-align:left;line-height:12pt;background-color:white;width:100%;">                b.smArray[j].col = smArray[i].row;</pre><br><!--CRLF--></p>
+<p><pre style="text-align:left;line-height:12pt;background-color:#f4f4f4;width:100%;">                b.smArray[j].value = smArray[i].value;</pre><br><!--CRLF--></p>
+<p><pre style="text-align:left;line-height:12pt;background-color:white;width:100%;">                rowStart[smArray[i].col]++;    <span style="color:#008000;">//这一步将每行的rowStart定位向后移    </span></pre><br><!--CRLF--></p>
+<p><pre style="text-align:left;line-height:12pt;background-color:#f4f4f4;width:100%;">            }</pre><br><!--CRLF--></p>
+<p><pre style="text-align:left;line-height:12pt;background-color:white;width:100%;">        }</pre><br><!--CRLF--></p>
+<p><pre style="text-align:left;line-height:12pt;background-color:#f4f4f4;width:100%;">            <span style="color:#0000ff;">delete</span>[] rowSize; <span style="color:#0000ff;">delete</span>[] rowStart;</pre><br><!--CRLF--></p>
+<p><pre style="text-align:left;line-height:12pt;background-color:white;width:100%;">        <span style="color:#0000ff;">return</span> b;</pre><br><!--CRLF--></p>
+<p><pre style="text-align:left;line-height:12pt;background-color:#f4f4f4;width:100%;">    }</pre><br><!--CRLF--></p>
+<p><br><br>3. 三元组的稀疏矩阵相乘</p>
+<div id="codeSnippetWrapper" style="text-align:left;line-height:12pt;background-color:#f4f4f4;width:97.5%;font-family:'Courier New', courier, monospace;direction:ltr;max-height:200px;font-size:8pt;overflow:auto;cursor:text;border:silver 1px solid;margin:20px 0 10px;padding:4px;"><br><div id="codeSnippet" style="text-align:left;line-height:12pt;background-color:#f4f4f4;width:100%;font-family:'Courier New', courier, monospace;direction:ltr;color:black;font-size:8pt;overflow:visible;border-style:none;padding:0;"><br><pre style="text-align:left;line-height:12pt;background-color:white;width:100%;"><span style="color:#0000ff;">template</span>&lt;<span style="color:#0000ff;">class</span> Type&gt; SparseMatrix&lt;Type&gt; SparseMatrix&lt;Type&gt;::Multiply(SparseMatrix&lt;Type&gt; b){</pre><br><!--CRLF--><br><pre style="text-align:left;line-height:12pt;background-color:#f4f4f4;width:100%;">    <span style="color:#0000ff;">if</span>(Cols!=b.Rows){</pre><br><!--CRLF--><br><pre style="text-align:left;line-height:12pt;background-color:white;width:100%;">        cout &lt;&lt; <span style="color:#006080;">“Incompatible matrices”</span> &lt;&lt; endl;</pre><br><!--CRLF--><br><pre style="text-align:left;line-height:12pt;background-color:#f4f4f4;width:100%;">        <span style="color:#0000ff;">return</span> EmptyMatrix();</pre><br><!--CRLF--><br><pre style="text-align:left;line-height:12pt;background-color:white;width:100%;">    }</pre><br><!--CRLF--><br><pre style="text-align:left;line-height:12pt;background-color:#f4f4f4;width:100%;">    <span style="color:#0000ff;">if</span>(Terms==MaxTerms || b.Terms==MaxTerms){</pre><br><!--CRLF--><br><pre style="text-align:left;line-height:12pt;background-color:white;width:100%;">        cout &lt;&lt; <span style="color:#006080;">“One additional space in a or b needed”</span> &lt;&lt; endl;</pre><br><!--CRLF--><br><pre style="text-align:left;line-height:12pt;background-color:#f4f4f4;width:100%;">        <span style="color:#0000ff;">return</span> EmptyMatrix();</pre><br><!--CRLF--><br><pre style="text-align:left;line-height:12pt;background-color:white;width:100%;">    }</pre><br><!--CRLF--><br><pre style="text-align:left;line-height:12pt;background-color:#f4f4f4;width:100%;">    <span style="color:#0000ff;">int</span> <em>rowSize = <span style="color:#0000ff;">new</span> <span style="color:#0000ff;">int</span>[b.Rows];</em></pre><br><!--CRLF--><br><pre style="text-align:left;line-height:12pt;background-color:white;width:100%;">    <span style="color:#0000ff;">int</span> rowStart = <span style="color:#0000ff;">new</span> <span style="color:#0000ff;">int</span>[b.Rows+1];</pre><br><!--CRLF--><br><pre style="text-align:left;line-height:12pt;background-color:#f4f4f4;width:100%;">    Type <em>temp = <span style="color:#0000ff;">new</span> Type[b.Cols];</em></pre><br><!--CRLF--><br><pre style="text-align:left;line-height:12pt;background-color:white;width:100%;">    SparseMatrix&lt;Type&gt; result(Rows,Cols);    <span style="color:#008000;">//构造运算的结果矩阵        </span></pre><br><!--CRLF--><br><pre style="text-align:left;line-height:12pt;background-color:#f4f4f4;width:100%;">    <span style="color:#0000ff;">for</span>(<span style="color:#0000ff;">int</span> i=0;i&lt;b.Rows;i++) rowSize[i]=0;</pre><br><!--CRLF--><br><pre style="text-align:left;line-height:12pt;background-color:white;width:100%;">    <span style="color:#0000ff;">for</span>(i=0;i&lt;b.Terms;i++) rowSize[smArray[i].row]++;</pre><br><!--CRLF--><br><pre style="text-align:left;line-height:12pt;background-color:#f4f4f4;width:100%;">    rowStart[0]=0;</pre><br><!--CRLF--><br><pre style="text-align:left;line-height:12pt;background-color:white;width:100%;">    <span style="color:#0000ff;">for</span>(i=1;i&lt;b.Rows;i++) rowStart[i]=rowStart[i-1]+rowSize[i-1];</pre><br><!--CRLF--><br><pre style="text-align:left;line-height:12pt;background-color:#f4f4f4;width:100%;">    <span style="color:#0000ff;">int</span> Current=0; lastInResult=-1;</pre><br><!--CRLF--><br><pre style="text-align:left;line-height:12pt;background-color:white;width:100%;">    <span style="color:#0000ff;">while</span>(Current&lt;Terms){</pre><br><!--CRLF--><br><pre style="text-align:left;line-height:12pt;background-color:#f4f4f4;width:100%;">        <span style="color:#0000ff;">int</span> RowA = smArray[Current].row;</pre><br><!--CRLF--><br><pre style="text-align:left;line-height:12pt;background-color:white;width:100%;">        <span style="color:#0000ff;">for</span>(i=0;i&lt;b.Cols;i++) temp[i]=0;</pre><br><!--CRLF--><br><pre style="text-align:left;line-height:12pt;background-color:#f4f4f4;width:100%;">        <span style="color:#0000ff;">while</span>(Current&lt;Terms&amp;&amp;smArray[Current].row==RowA){<span style="color:#008000;">//生产temp数组</span></pre><br><!--CRLF--><br><pre style="text-align:left;line-height:12pt;background-color:white;width:100%;">            <span style="color:#0000ff;">int</span> ColA = smArray[Current].col;</pre><br><!--CRLF--><br><pre style="text-align:left;line-height:12pt;background-color:#f4f4f4;width:100%;">            <span style="color:#0000ff;">for</span>(i=rowStart[ColA];i&lt;rowStart[ColA+1];i++){</pre><br><!--CRLF--><br><pre style="text-align:left;line-height:12pt;background-color:white;width:100%;">                <span style="color:#0000ff;">int</span> ColB = b.smArray[i].col;</pre><br><!--CRLF--><br><pre style="text-align:left;line-height:12pt;background-color:#f4f4f4;width:100%;">                temp[ColB] = temp[ColB]+smArray[Current].value  b.smArray[i].value;</pre><br><!--CRLF--><br><pre style="text-align:left;line-height:12pt;background-color:white;width:100%;">            }</pre><br><!--CRLF--><br><pre style="text-align:left;line-height:12pt;background-color:#f4f4f4;width:100%;">            Current++;</pre><br><!--CRLF--><br><pre style="text-align:left;line-height:12pt;background-color:white;width:100%;">        }</pre><br><!--CRLF--><br><pre style="text-align:left;line-height:12pt;background-color:#f4f4f4;width:100%;">        <span style="color:#0000ff;">for</span>(i=0;i&lt;b.Cols;i++)<span style="color:#008000;">//将每一行的计算结果保存到result数组</span></pre><br><!--CRLF--><br><pre style="text-align:left;line-height:12pt;background-color:white;width:100%;">            <span style="color:#0000ff;">if</span>(temp[i]!=0){</pre><br><!--CRLF--><br><pre style="text-align:left;line-height:12pt;background-color:#f4f4f4;width:100%;">                lastInResult++;</pre><br><!--CRLF--><br><pre style="text-align:left;line-height:12pt;background-color:white;width:100%;">                    result.smArray[LastInResult].row = RowA;</pre><br><!--CRLF--><br><pre style="text-align:left;line-height:12pt;background-color:#f4f4f4;width:100%;">                    result.smArray[LastInResult].col = i;</pre><br><!--CRLF--><br><pre style="text-align:left;line-height:12pt;background-color:white;width:100%;">                    result.smArray[LastInResult].value = temp[i];</pre><br><!--CRLF--><br><pre style="text-align:left;line-height:12pt;background-color:#f4f4f4;width:100%;">            }</pre><br><!--CRLF--><br><pre style="text-align:left;line-height:12pt;background-color:white;width:100%;">    }</pre><br><!--CRLF--><br><pre style="text-align:left;line-height:12pt;background-color:#f4f4f4;width:100%;">    result.Rows = Rows; result.Cols = b.Cols; result.Terms = lastInResult + 1;</pre><br><!--CRLF--><br><pre style="text-align:left;line-height:12pt;background-color:white;width:100%;">    <span style="color:#0000ff;">delete</span>[] rowSize; <span style="color:#0000ff;">delete</span>[] rowStart; <span style="color:#0000ff;">delete</span>[] temp;</pre><br><!--CRLF--><br><pre style="text-align:left;line-height:12pt;background-color:#f4f4f4;width:100%;">    <span style="color:#0000ff;">return</span> result;</pre><br><!--CRLF--><br><pre style="text-align:left;line-height:12pt;background-color:white;width:100%;">}</pre><br><!--CRLF--><br><br></div><br></div>
+  </div>
+  <footer class="article-footer">
+    
+  <div class="cc">
+    <a href="http://creativecommons.org/licenses/by-sa/4.0/deed.e" target="_blank" title="Attribution-ShareAlike">
+      <img src="/images/cc/cc.png">
+      
+          <img src="/images/cc/by.png">
+        
+          <img src="/images/cc/sa.png">
+      
+      <span>
+        This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.
+      </span>
+    </a>
+  </div>
+
+
+    
+
+  </footer>
+</article>
+
+
+
+
+
+
+
+          <div class="main-footer">
+  
+    © 2016 Kevin&#39;s Blog - Powered by <a href="http://hexo.io" target="_blank">Hexo</a> - Theme <a href="https://github.com/denjones/hexo-theme-chan" target="_blank">Chan</a>
+  
+</div>
+
+      
+        </div>
+      
+    </div>
+  </div>
+  <script src="//apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+
+  <link rel="stylesheet" href="/PhotoSwipe/photoswipe.css">
+  <link rel="stylesheet" href="/PhotoSwipe/default-skin/default-skin.css">
+
+  <!-- Root element of PhotoSwipe. Must have class pswp. -->
+  <div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    <!-- Background of PhotoSwipe.
+             It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+
+      <!-- Container that holds slides.
+                PhotoSwipe keeps only 3 of them in the DOM to save memory.
+                Don't modify these 3 pswp__item elements, data is added later on. -->
+      <div class="pswp__container">
+        <div class="pswp__item"></div>
+        <div class="pswp__item"></div>
+        <div class="pswp__item"></div>
+      </div>
+
+      <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+      <div class="pswp__ui pswp__ui--hidden">
+
+        <div class="pswp__top-bar">
+
+          <!--  Controls are self-explanatory. Order can be changed. -->
+
+          <div class="pswp__counter"></div>
+
+          <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+          <button class="pswp__button pswp__button--share" title="Share"></button>
+
+          <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+          <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+          <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+          <!-- element will get class pswp__preloader--active when preloader is running -->
+          <div class="pswp__preloader">
+            <div class="pswp__preloader__icn">
+              <div class="pswp__preloader__cut">
+                <div class="pswp__preloader__donut"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+          <div class="pswp__share-tooltip"></div>
+        </div>
+
+        <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)"></button>
+
+        <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)"></button>
+
+        <div class="pswp__caption">
+          <div class="pswp__caption__center"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/PhotoSwipe/photoswipe.js"></script>
+  <script src="/PhotoSwipe/photoswipe-ui-default.js"></script>
+
+
+<script src="/perfect-scrollbar/js/min/perfect-scrollbar.min.js"></script>
+<script src="/scripts/main.js"></script>
+
+</body>
+</html>
