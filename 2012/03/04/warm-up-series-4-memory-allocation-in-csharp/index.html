@@ -1,185 +1,17 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="author" content="Hao Xi"><meta name="description" content="在写完上一篇文章后，开始联想到.NET的内存管理机制，于是继续Google出一些文章，大概对C#中的内存管理有了了解。C#的内存管理的实现是在操作系统内存管理之上的，特别是托管堆的3generations的设计，既保护了代码编写的方便性，也充分考虑了性能的优化。按照MSDN文"><meta name="keywords" content="C#"><title>Warm Up Series (4) – Memory Allocation in CSharp · Kevin's Blog</title><link rel="icon" href="/favicon.ico"><link rel="canonical" href="http://yoursite.com/2012/03/04/warm-up-series-4-memory-allocation-in-csharp/"><link rel="alternate" href="/atom.xml" title="Kevin's Blog"><link rel="stylesheet" href="/fonts/iconfont/iconfont.css"><link rel="stylesheet" href="/css/style.css"><script type="text/javascript">var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?Your baidu Analytics ID";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script><script type="text/javascript">(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
-
-
-<title>
-  
-    Warm Up Series (4) – Memory Allocation in CSharp
-  
-</title>
-
-<meta name="description" content="在写完上一篇文章后，开始联想到.NET的内存管理机制，于是继续Google出一些文章，大概对C#中的内存管理有了了解。C#的内存管理的实现是在操作系统内存管理之上的，特别是托管堆的3 generations的设计，既保护了代码编写的方便性，也充分考虑了性能的优化。
-按照MSDN文档介绍，除stackalloc运算符外，C#不提供其他任何方法来操作非托管的内存。所以这些服务通常只能由基础操作系统导入">
-<meta property="og:type" content="article">
-<meta property="og:title" content="Warm Up Series (4) – Memory Allocation in CSharp">
-<meta property="og:url" content="http://yoursite.com/2012/03/04/warm-up-series-4-memory-allocation-in-csharp/index.html">
-<meta property="og:site_name" content="Kevin's Blog">
-<meta property="og:description" content="在写完上一篇文章后，开始联想到.NET的内存管理机制，于是继续Google出一些文章，大概对C#中的内存管理有了了解。C#的内存管理的实现是在操作系统内存管理之上的，特别是托管堆的3 generations的设计，既保护了代码编写的方便性，也充分考虑了性能的优化。
-按照MSDN文档介绍，除stackalloc运算符外，C#不提供其他任何方法来操作非托管的内存。所以这些服务通常只能由基础操作系统导入">
-<meta property="og:updated_time" content="2016-10-23T13:39:54.000Z">
-<meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Warm Up Series (4) – Memory Allocation in CSharp">
-<meta name="twitter:description" content="在写完上一篇文章后，开始联想到.NET的内存管理机制，于是继续Google出一些文章，大概对C#中的内存管理有了了解。C#的内存管理的实现是在操作系统内存管理之上的，特别是托管堆的3 generations的设计，既保护了代码编写的方便性，也充分考虑了性能的优化。
-按照MSDN文档介绍，除stackalloc运算符外，C#不提供其他任何方法来操作非托管的内存。所以这些服务通常只能由基础操作系统导入">
-
-
-  <link rel="alternative" href="/atom.xml" title="Kevin&#39;s Blog" type="application/atom+xml">
-
-
-
-  <link rel="icon" href="/favicon.png">
-
-
-<link rel="stylesheet" href="/perfect-scrollbar/css/perfect-scrollbar.min.css">
-<link rel="stylesheet" href="/styles/main.css">
-
-
-
-
-
-
-</head>
-<body
-  
-    class="monochrome"
-  
-  >
-  <div class="mobile-header">
-  <button class="sidebar-toggle" type="button">
-    <span class="icon-bar"></span>
-    <span class="icon-bar"></span>
-    <span class="icon-bar"></span>
-  </button>
-  <a class="title" href="/">Kevin&#39;s Blog</a>
-</div>
-
-  <div class="main-container">
-    <div class="sidebar">
-  <div class="header">
-    <h1 class="title"><a href="/">Kevin&#39;s Blog</a></h1>
-    
-    <div class="info">
-      <div class="content">
-        
-        
-          <div class="author">Hao Xi</div>
-        
-      </div>
-      
-        <div class="avatar">
-          
-            <a href="/about"><img src="https://cn.gravatar.com/avatar/35fef74d731255cd569c2c2b0b9e87e4?s=200"></a>
-          
-        </div>
-      
-    </div>
-  </div>
-  <div class="body">
-    
-      
-        <ul class="nav">
-          
-            
-              <li class="category-list-container">
-                <a href="javascript:;">Category</a>
-                <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Algorithms/">Algorithms</a><span class="category-list-count">13</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Asp-Net/">Asp.Net</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Basic-Theory/">Basic Theory</a><span class="category-list-count">5</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Default/">Default</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/GNU-Linux/">GNU/Linux</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Interview/">Interview</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Kevin-s-Life/">Kevin's Life</a><span class="category-list-count">9</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Performance/">Performance</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Phone/">Phone</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Programming/">Programming</a><span class="category-list-count">10</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Rework/">Rework</a><span class="category-list-count">1</span></li></ul>
-              </li>
-            
-          
-            
-              <li class="tag-list-container">
-                <a href="javascript:;">Tag</a>
-                <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/2011-Plan/">2011 Plan</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ACM-ICPC/">ACM-ICPC</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ActiveX/">ActiveX</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/AfterLogic/">AfterLogic</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Algorithms/">Algorithms</a><span class="tag-list-count">11</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Android/">Android</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Asp-Net/">Asp.Net</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/BFS/">BFS</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Business/">Business</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/C/">C#</a><span class="tag-list-count">10</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/CLRS/">CLRS</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Concurrent/">Concurrent</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Coverage/">Coverage</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Critical-Section/">Critical Section</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/DFS/">DFS</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Data-Structure/">Data Structure</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Design-Pattern-Series/">Design Pattern Series</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Dovecot/">Dovecot</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Download-Website/">Download Website</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Dream/">Dream</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Email/">Email</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Environment-Variables/">Environment Variables</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/First-Post/">First Post</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Freelance/">Freelance</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/GNOME/">GNOME</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Generic/">Generic</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Happiness/">Happiness</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Heap/">Heap</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/If-You-Are-The-One/">If You Are The One</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Interview/">Interview</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JavaScript/">JavaScript</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JobFinder/">JobFinder</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Josephus/">Josephus</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/KDE/">KDE</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/KMP/">KMP</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Let-The-Bullet-Fly/">Let The Bullet Fly</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Linux/">Linux</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/MSMQ/">MSMQ</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Mac/">Mac</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Management/">Management</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Memory/">Memory</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Monte-Carlo/">Monte Carlo</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Movies/">Movies</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Mutex/">Mutex</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/My-Blogs/">My Blogs</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/My-Life/">My Life</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/My-Name/">My Name</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/MySQL/">MySQL</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Ncover/">Ncover</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Nunit/">Nunit</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Old-Boys/">Old Boys</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Online-Judge/">Online Judge</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/OpenMP/">OpenMP</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Parallel-Programming/">Parallel Programming</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Postfix/">Postfix</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Present/">Present</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Primer/">Primer</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Python/">Python</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Queue/">Queue</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Reading/">Reading</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Recursion/">Recursion</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Reverse-Polish-Notation/">Reverse Polish Notation</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Rework/">Rework</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ShengYiJie/">ShengYiJie</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Silverlight/">Silverlight</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Singleton/">Singleton</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Sparse-Matrix/">Sparse Matrix</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Stack/">Stack</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Stirling-s-Formula/">Stirling's Formula</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/String-Matching/">String Matching</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Template/">Template</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Teru-Teru-Bouz/">Teru Teru Bouz</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/The-bright-eleven/">The bright eleven</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Theory/">Theory</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Thread/">Thread</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Trace/">Trace</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Translation/">Translation</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Triple-Table/">Triple Table</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Unit-Test/">Unit Test</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/VPS/">VPS</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Webmail/">Webmail</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Wedding/">Wedding</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Windows/">Windows</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Windows-Phone-7/">Windows Phone 7</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/X-Window/">X Window</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Xml/">Xml</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/iPhone/">iPhone</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vWorker/">vWorker</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/wget/">wget</a><span class="tag-list-count">1</span></li></ul>
-              </li>
-            
-          
-            
-              <li class="archive-list-container">
-                <a href="javascript:;">Archive</a>
-                <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/">2016</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2012/">2012</a><span class="archive-list-count">17</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2011/">2011</a><span class="archive-list-count">8</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2010/">2010</a><span class="archive-list-count">25</span></li></ul>
-              </li>
-            
-          
-        </ul>
-      
-        <ul class="nav">
-          
-            
-              <li>
-                <a href="/" title="Homepage">Homepage</a>
-              </li>
-            
-          
-            
-              <li>
-                <a href="/archives" title="By Year">By Year</a>
-              </li>
-            
-          
-        </ul>
-      
-        <ul class="nav">
-          
-            
-              <li>
-                <a href="https://github.com/denjones/hexo-theme-chan" title="Chan" target="_blank" rel="external">Chan</a>
-              </li>
-            
-          
-            
-              <li>
-                <a href="https://github.com/denjones" title="Github" target="_blank" rel="external">Github</a>
-              </li>
-            
-          
-            
-              <li>
-                <a href="/atom.xml" title="RSS">RSS</a>
-              </li>
-            
-          
-        </ul>
-      
-    
-  </div>
-</div>
-
-    <div class="main-content">
-      
-        <div style="max-width: 1000px">
-      
-          <article id="post-warm-up-series-4-memory-allocation-in-csharp" class="article article-type-post">
-  
-    <h1 class="article-header">
-      Warm Up Series (4) – Memory Allocation in CSharp
-    </h1>
-  
-  
-
-  <div class="article-info">
-    <span class="article-date">
-  2012-03-04
-</span>
-
-    
-	<span class="article-category tagcloud">
-	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/Programming/">Programming</a><ul class="article-category-list-child"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/Programming/Warm-Up/">Warm Up</a></li></ul></li></ul>
-	</span>
-
-
-    
-	<span class="article-tag tagcloud">
-		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/C/">C#</a></li></ul>
-	</span>
-
-
-  </div>
-  <div class="article-entry">
-    <p>在写完上一篇文章后，开始联想到.NET的内存管理机制，于是继续Google出一些文章，大概对C#中的内存管理有了了解。C#的内存管理的实现是在操作系统内存管理之上的，特别是托管堆的3 generations的设计，既保护了代码编写的方便性，也充分考虑了性能的优化。</p>
+ga('create', 'Your Google Analytics ID', 'auto');
+ga('send', 'pageview');</script></head><body><div id="main"><header><a href="/." class="logo">Kevin's Blog</a><ul class="nav"><li class="nav-link"><a href="/" target="_self">Home</a></li><li class="nav-link"><a href="/archives/" target="_self">Archives</a></li><li class="nav-link"><a href="/categories/" target="_self">Categories</a></li><li class="nav-link"><a href="/tags/" target="_self">Tags</a></li><li class="nav-link"><a href="/about/" target="_self">About</a></li></ul></header><section id="container"><article class="post"><h1 class="post-title">Warm Up Series (4) – Memory Allocation in CSharp</h1><span class="post-time">Mar 4, 2012</span><div class="post-content"><p>在写完上一篇文章后，开始联想到.NET的内存管理机制，于是继续Google出一些文章，大概对C#中的内存管理有了了解。C#的内存管理的实现是在操作系统内存管理之上的，特别是托管堆的3 generations的设计，既保护了代码编写的方便性，也充分考虑了性能的优化。</p>
 <p>按照MSDN文档介绍，除stackalloc运算符外，C#不提供其他任何方法来操作非托管的内存。所以这些服务通常只能由基础操作系统导入。<a href="http://msdn.microsoft.com/zh-cn/library/aa664786(v=vs.71" target="_blank" rel="external">这里的例子</a>.aspx)通过非安全代码调用系统API实现了托管堆以外的内存管理。</p>
 <p>&#160;</p>
 <p>转自《<a href="http://www.cnblogs.com/yangjunwl/archive/2008/01/08/1029903.html" target="_blank" rel="external">C#的内存管理：堆栈、托管堆与指针</a>》</p>
@@ -210,120 +42,16 @@
 
 <p>好了，same又是true了。Intern方法接受一个字符串作为参数，它会在驻留池中检查是否存在参数所表示的字符串。如果存在，则返回那个驻留池中的字符串的引用；否则向驻留池中加入一个新的表示相同值的字符串，并返回这个字符串的引用。不过要注意的是，就算Intern方法在驻留池中找到了相同值的字符串，也不能让您省却一次字符串内存分配的操作，因为作为参数的字符串已经被分配了一次内存了。而使用Intern方法的好处在于，如果Intern方法在驻留池中找到了相同值的字符串，此时虽然在内存中存在两份该字符串的副本（一份是参数，一份是驻留池中的），但是随着时间的流逝，参数所引用的那个副本会被垃圾回收掉，这样对于该字符串内存中就不存在冗余了。</p>
 <p>当您的程序中存在某个方法，可以根据不同的上下文环境创建并返回一个很长的字符串，而在程序运行的过程中它有会经常返回同样的字符串时，您可能就要考虑考虑使用Intern方法来提高内存的利用率了。不过同样值得注意的是，使用Intern方法让一个字符串存活于驻留池中也有一个副作用：即使已经不存在任何其它引用指向驻留池中的字符串了，这个字符串仍然不一定会被垃圾回收掉。也就是说即使驻留池中的字符串已经没有用处了，它可能也要等到CLR终结时才被销毁。当您使用Intern方法的时候，也应该考虑到这个特殊的行为。</p>
+</div></article><div class="tags"><a href="/tags/C/">C#</a></div><div class="paginator"><a href="/2012/03/07/sum1n-problem/" class="prev"><i class="iconfont icon-left"></i><span> Prev</span></a><a href="/2012/03/04/warm-up-series-3-dynamic-memory-allocation/" class="next"><span>Next</span><i class="iconfont icon-right"></i></a></div><section id="comments"><div id="disqus_thread"></div></section><script type="text/javascript">var disqus_config = function () {
+    this.page.url = 'http://yoursite.com/2012/03/04/warm-up-series-4-memory-allocation-in-csharp/';
+    this.page.identifier = '2012/03/04/warm-up-series-4-memory-allocation-in-csharp/';
+    this.page.title = 'Warm Up Series (4) – Memory Allocation in CSharp';
+};
+(function() {
+var d = document, s = d.createElement('script');
 
-  </div>
-  <footer class="article-footer">
-    
-  <div class="cc">
-    <a href="http://creativecommons.org/licenses/by-sa/4.0/deed.e" target="_blank" title="Attribution-ShareAlike">
-      <img src="/images/cc/cc.png">
-      
-          <img src="/images/cc/by.png">
-        
-          <img src="/images/cc/sa.png">
-      
-      <span>
-        This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.
-      </span>
-    </a>
-  </div>
+s.src = '//Your disqus ID.disqus.com/embed.js';
 
-
-    
-
-  </footer>
-</article>
-
-
-
-
-
-
-
-          <div class="main-footer">
-  
-    © 2016 Kevin&#39;s Blog - Powered by <a href="http://hexo.io" target="_blank">Hexo</a> - Theme <a href="https://github.com/denjones/hexo-theme-chan" target="_blank">Chan</a>
-  
-</div>
-
-      
-        </div>
-      
-    </div>
-  </div>
-  <script src="//apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
-
-  <link rel="stylesheet" href="/PhotoSwipe/photoswipe.css">
-  <link rel="stylesheet" href="/PhotoSwipe/default-skin/default-skin.css">
-
-  <!-- Root element of PhotoSwipe. Must have class pswp. -->
-  <div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
-
-    <!-- Background of PhotoSwipe.
-             It's a separate element as animating opacity is faster than rgba(). -->
-    <div class="pswp__bg"></div>
-
-    <!-- Slides wrapper with overflow:hidden. -->
-    <div class="pswp__scroll-wrap">
-
-      <!-- Container that holds slides.
-                PhotoSwipe keeps only 3 of them in the DOM to save memory.
-                Don't modify these 3 pswp__item elements, data is added later on. -->
-      <div class="pswp__container">
-        <div class="pswp__item"></div>
-        <div class="pswp__item"></div>
-        <div class="pswp__item"></div>
-      </div>
-
-      <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
-      <div class="pswp__ui pswp__ui--hidden">
-
-        <div class="pswp__top-bar">
-
-          <!--  Controls are self-explanatory. Order can be changed. -->
-
-          <div class="pswp__counter"></div>
-
-          <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
-
-          <button class="pswp__button pswp__button--share" title="Share"></button>
-
-          <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
-
-          <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
-
-          <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
-          <!-- element will get class pswp__preloader--active when preloader is running -->
-          <div class="pswp__preloader">
-            <div class="pswp__preloader__icn">
-              <div class="pswp__preloader__cut">
-                <div class="pswp__preloader__donut"></div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
-          <div class="pswp__share-tooltip"></div>
-        </div>
-
-        <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)"></button>
-
-        <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)"></button>
-
-        <div class="pswp__caption">
-          <div class="pswp__caption__center"></div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <script src="/PhotoSwipe/photoswipe.js"></script>
-  <script src="/PhotoSwipe/photoswipe-ui-default.js"></script>
-
-
-<script src="/perfect-scrollbar/js/min/perfect-scrollbar.min.js"></script>
-<script src="/scripts/main.js"></script>
-
-</body>
-</html>
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();</script></section><footer><div class="copyright"><p class="power">Powered by <a href="https://hexo.io/">Hexo</a> and Theme by <a href="https://github.com/ahonn/hexo-theme-even"> Even</a></p><p class="since">&copy;2016<span class="heart"><i class="iconfont icon-heart"></i></span><span class="author">Hao Xi</span></p></div><label id="back2top"><i class="iconfont icon-up"></i></label></footer></div><script src="/js/zepto.min.js"></script><script src="/js/theme.js"></script></body></html>
